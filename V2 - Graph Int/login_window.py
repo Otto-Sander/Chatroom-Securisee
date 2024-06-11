@@ -49,29 +49,51 @@ class LoginWindow:
 
         window_width, window_height, center_x, center_y = return_center_coord(self)
 
-        # set the position of the window to the center of the screen
-        self.master.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
-
         # Cadre principal
-        self.frame = tk.Frame(self.master,bg='#152242',width='950',height=600)
+        self.frame = tk.Frame(self.master,bg='#152242',width=950,height=600)
         self.frame.place(x=200,y=70)
-        
-        # Texte de bienvenue
-        self.welcome_label = tk.Label(self.frame, justify="left", font=head1, text="Bonjour et bienvenue dans notre application sécurisée de Data Room Virtuelle !", wraplength=500, pady=30, fg="white")
-        self.welcome_label.configure(background='#152242')
-        self.welcome_label.pack(pady=5)
-        self.welcome_label_2 = tk.Label(self.frame, justify="left", font=head2, text="Nous sommes ravis de vous avoir parmi nous !", wraplength=500, pady=30, fg="white")
-        self.welcome_label_2.configure(background='#152242')
-        self.welcome_label_2.pack(pady=5)
 
-        self.login_button = tk.Button(self.frame, text="Suivant", command=self.show_authentication, font=head4_button)
-        self.login_button.pack(side=tk.RIGHT, anchor=tk.SE, pady=60)
+        #Introduction : 1
+        txt = "Bonjour et bienvenue \ndans notre application sécurisée de Data Room Virtuelle !"
+        self.heading_1 = Label(self.frame, text=txt, font=head1, bg='#152242', fg='white', justify=LEFT)
+        self.heading_1.place(x=60, y=30, width=800, height=200)
+
+        # Introduction : 2
+        txt_intro2 = "Nous sommes ravis de vous avoir parmi nous !"
+        self.heading_2 = Label(self.frame, text=txt_intro2, font=head2, bg='#152242', fg='white', justify=LEFT)
+        self.heading_2.place(x=0, y=180, width=680, height=50)
+
+        # Left Image
+        image_path = "V2 - Graph Int/Images/Logo.jpeg"
+        image = Image.open(image_path)
+        image = image.resize((230,230))
+        image = ImageTk.PhotoImage(image)
+        label = Label(self.frame, image=image,borderwidth=0)
+        label.image = image  # Référence nécessaire pour empêcher la collecte des déchets
+        label.place(x=140, y=300)
+
+        # Charger l'image et la redimensionner
+        button = Image.open("V2 - Graph Int/Images/logo_next.png")
+        resized_image = button.resize((90, 90))
+
+        # Convertir l'image redimensionnée en format ImageTk.PhotoImage
+        image = ImageTk.PhotoImage(resized_image)
+
+        # Créer le bouton avec l'image redimensionnée
+        self.roundedbutton = tk.Button(self.frame, image=image, bd=0, borderwidth=0,bg="#152242",command=self.show_authentication)
+        self.roundedbutton.image = image  # Gardez une référence à l'image pour éviter la collecte des déchets
+        self.roundedbutton.place(x=700, y=420)
 
     #Connection panel : login
     def show_authentication(self):
-        self.welcome_label.destroy()
-        self.welcome_label_2.destroy()
-        self.login_button.destroy()
+        self.frame.destroy()
+
+        # Cadre principal
+        self.frame = tk.Frame(self.master,bg='#152242',width=950,height=600)
+        self.frame.place(x=200,y=70)
+
+        
+
 
         # Texte de bienvenue
         self.enter_info = tk.Label(self.frame, justify="left", font=head2, text="Veuillez vous connecter avec vos identifiants pour accéder à l'espace de chat et de partage de documents.\n", wraplength=400, fg="white")
