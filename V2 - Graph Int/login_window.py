@@ -13,10 +13,10 @@ Fonctionnalités :
 - Options pour se connecter ou créer un nouveau compte.
 - Connexion à une salle de chat sécurisée après l'authentification.
 """
-
+from PIL import Image,ImageTk
+from tkinter import *
 import tkinter as tk
-from tkinter import messagebox
-from open_chatroom import open_chatroom 
+from open_chatroom import open_chatroom
 from PIL import ImageTk, Image
 
 # Définition des polices
@@ -47,10 +47,10 @@ class LoginWindow:
         self.master = master
         self.master.title("Authentification")
 
-        # Set the position of the window 
-        self.master.geometry('1166x718')
-        self.master.state('zoomed')
-        self.master.resizable(0,0)
+        window_width, window_height, center_x, center_y = return_center_coord(self)
+
+        # set the position of the window to the center of the screen
+        self.master.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
 
         # Cadre principal
         self.frame = tk.Frame(master)
