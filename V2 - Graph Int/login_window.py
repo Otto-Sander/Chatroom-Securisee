@@ -53,9 +53,8 @@ class LoginWindow:
         self.master.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
 
         # Cadre principal
-        self.frame = tk.Frame(master)
-        self.frame.configure(background='#152242')
-        self.frame.pack(padx=40, pady=40)
+        self.frame = tk.Frame(self.master,bg='#152242',width='950',height=600)
+        self.frame.place(x=200,y=70)
         
         # Texte de bienvenue
         self.welcome_label = tk.Label(self.frame, justify="left", font=head1, text="Bonjour et bienvenue dans notre application sécurisée de Data Room Virtuelle !", wraplength=500, pady=30, fg="white")

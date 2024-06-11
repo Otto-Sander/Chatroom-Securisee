@@ -11,16 +11,22 @@ Fonctionnalités :
 """
 import tkinter as tk
 from login_window import LoginWindow
+from tkinter import *
+from PIL import ImageTk, Image
 
 #MainLoop
 if __name__ == "__main__":
     #Fenêtre principale
     root = tk.Tk()
     root.state('zoomed')
-    root.configure(background=
-                   #'#152242'
-                   'white'
-                   )
+    
+    # Charger l'image et la redimensionner pour qu'elle s'adapte à la taille de la fenêtre
+    image = Image.open("V2 - Graph Int\Images\Background_Welcomming_flou.png")
+    image = image.resize((root.winfo_screenwidth(), root.winfo_screenheight()))
+    background_image = ImageTk.PhotoImage(image)
+    label = Label(root,image=background_image)
+    label.place(x=0,y=0,relwidth=1,relheight=1)
+
     #Lance l'application
     app = LoginWindow(root)
     root.mainloop()
