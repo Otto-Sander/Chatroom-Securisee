@@ -21,7 +21,7 @@ if __name__ == "__main__":
     root.state('zoomed')
 
     # Charger l'image et la redimensionner pour qu'elle s'adapte à la taille de la fenêtre
-    image = Image.open("Images\Background_Welcomming_flou.png")
+    image = Image.open("Images\\Background_Welcomming_flou.png")
     image = image.resize((root.winfo_screenwidth(), root.winfo_screenheight()))
     
     background_image = ImageTk.PhotoImage(image)
