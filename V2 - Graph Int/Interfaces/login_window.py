@@ -34,7 +34,8 @@ hover_button="#C9511D"
 # Définition des polices
 head1 = ("Lexend", 25, "bold") 
 head2 = ("Lexend", 19)
-head3 = ("Lexend", 12, "bold")
+head3 = ("Lexend", 15)
+head4 = ("Lexend", 11)
 head4_button = ("Lexend", 9)
 
 #Classe principale de login
@@ -50,14 +51,13 @@ class LoginWindow:
 
         #Introduction : 1 --------------------------------------------------
         txt = "Welcome to our\nSecure Virtual Data Room application!"
-        self.heading_1 = Label(self.frame, text=txt, font=head1, bg=cadre, fg=letter, justify=LEFT)
-        #self.heading_1.place(x=0, y=30, width=900, height=200)
-        self.heading_1.place(relx=0.450, rely=0.2, anchor=tk.CENTER)
+        self.heading_1 = Label(self.frame, text=txt, font=head1, bg=cadre, fg=letter, justify=LEFT,anchor="w")
+        self.heading_1.place(relx=0.38, rely=0.15, anchor=tk.CENTER)
 
         # Introduction : 2 -------------------------------------------------
         txt_intro2 = "We're delighted to have you with us!"
-        self.heading_2 = Label(self.frame, text=txt_intro2, font=head2, bg=cadre, fg=letter, justify=LEFT)
-        self.heading_2.place(relx=0.092, rely=0.3, width=500, height=50)
+        self.heading_2 = Label(self.frame, text=txt_intro2, font=head2, bg=cadre, fg=letter, justify=LEFT,anchor="w")
+        self.heading_2.place(relx=0.067, rely=0.225, width=500, height=50)
 
         # Left Image ----------------------------------------
         image_path = "Images\logo.jpg"
@@ -66,7 +66,12 @@ class LoginWindow:
         image = ImageTk.PhotoImage(image)
         label = Label(self.frame, image=image,borderwidth=0)
         label.image = image  # Référence nécessaire pour empêcher la collecte des déchets
-        label.place(x=140, y=270)
+        label.place(x=73, y=230)
+
+        # Right Text - Presentation ------------------------------
+        txt_intro3 = "MasterCamp is your secure space to share documents\nand chat with complete confidentiality.Protect your\nexchanges with our encrypted communication and\ndetailed access management. Simplify your\nsensitive projects with MasterCamp!"
+        self.heading_3 = Label(self.frame, text=txt_intro3, font=head3, bg=cadre, fg=letter, justify=LEFT,anchor="w")
+        self.heading_3.place(relx=0.45, rely=0.32, width=400, height=200)
 
         # BOUTON-------------------------------------------
         button = Image.open("Images\logo_next.png")
@@ -87,170 +92,19 @@ class LoginWindow:
         self.frame = CTkFrame(self.master,width=950,height=600,corner_radius=30,fg_color=cadre,bg_color='#1A324C')
         self.frame.place(x=200,y=70)
 
+        # Title ---------------------------------------------------------
+        head = "Authentication"
+        self.heading_1 = Label(self.frame, text=head, font=head1, bg=cadre, fg=letter, justify=LEFT,anchor="nw")
+        self.heading_1.place(relx=0.065, rely=0.08, width=1000, height=100)
+
+
         #Introduction : 1 -----------------------------------------
         txt = "Please log in with\nyour login details to access the chat and document sharing area."
-        self.heading_1 = Label(self.frame, text=txt, font=head2, bg=cadre, fg=letter, justify=LEFT)
-        self.heading_1.place(x=0, y=30, width=1000, height=100)
+        self.heading_1 = Label(self.frame, text=txt, font=head2, bg=cadre, fg=letter, justify=LEFT,anchor="nw")
+        self.heading_1.place(relx=0.065, y=90, width=1000, height=100)
 
-        # Left Image ----------------------------------------------
-        image_path = "Images\login_interface.png"
-        image = Image.open(image_path)
-        image = image.resize((280,280))
-        image = ImageTk.PhotoImage(image)
-        label = Label(self.frame, image=image,borderwidth=0,bg=cadre)
-        label.image = image  # Référence nécessaire pour empêcher la collecte des déchets
-        label.place(x=140, y=250)
-
-        # User Image Panel ----------------------------------------------------
-        image = Image.open("Images\\user.png")
-        image = image.resize((60,60))
-        image = ImageTk.PhotoImage(image)
-        label = Label(self.frame, image=image,borderwidth=0,bg=cadre)
-        label.image = image  # Référence nécessaire pour empêcher la collecte des déchets
-        label.place(x=600, y=190)
-
-        # Sign Up Label -------------------------------------------------
-        self.sign_in_label = Label(self.frame, text='Sign In',bg=cadre,fg=letter,font=head2)
-        self.sign_in_label.place(x=598, y=255)
-
-        # Username ------------------------------------------------------
-        self.username_label = Label(self.frame, text='Username', bg=cadre, font=('yu gothic ui', 13, 'bold'),fg=letter)
-        self.username_label.place(x=500, y=300)
-        self.username_entry = Entry(self.frame, highlightthickness=0, relief=FLAT, bg=cadre, fg=letter,
-        font=('yu gothic ui', 12, 'bold'))
-        self.username_entry.place(x=525, y=332, width=270)
-        self.username_line = Canvas(self.frame, width=300, height=2.0, bg='#bdb9b1', highlightthickness=0)
-        self.username_line.place(x=500, y=359)
-
-        # User laber logo ----------------------------------------------
-        username_icon = Image.open('images/user_label.png')
-        resized_icon = username_icon.resize((20, 20))
-        photo_user = ImageTk.PhotoImage(resized_icon)
-        self.username_icon_label = Label(self.frame, image=photo_user, bg=cadre)
-        self.username_icon_label.image = photo_user
-        self.username_icon_label.place(x=500, y=332)
-
-        # Password ------------------------------------------------------
-        self.passwd_label = Label(self.frame, text='Password', bg=cadre, font=('yu gothic ui', 13, 'bold'),fg=letter)
-        self.passwd_label.place(x=500, y=370)
-        self.passwd_entry = Entry(self.frame, highlightthickness=0, relief=FLAT, bg=cadre, fg=letter,
-        font=('yu gothic ui', 12, 'bold'),show="*")
-        self.passwd_entry.place(x=525, y=403, width=270)
-        self.passwd_line = Canvas(self.frame, width=300, height=2.0, bg='#bdb9b1', highlightthickness=0)
-        self.passwd_line.place(x=500, y=430)
-
-        # Password laber logo ----------------------------------------------
-        passwd_icon = Image.open('images/lock.png')
-        resized_icon = passwd_icon.resize((20, 20))
-        photo_passwd = ImageTk.PhotoImage(resized_icon)
-        self.passwd_icon_label = Label(self.frame, image=photo_passwd, bg=cadre)
-        self.passwd_icon_label.image = photo_passwd
-        self.passwd_icon_label.place(x=500, y=403)
-
-        # Login Button ------------------------------------
-        button = CTkButton(master=self.frame,text='Login',corner_radius=32,fg_color='#4158D0',hover_color='#C850C0',width=300,font=head3,command=self.authenticate)
-        button.place(x=500,y=455)
-
-        # No account Label ---------------------------------------
-        self.sign_label = Label(self.frame, text='No account yet?', font=('yu gothic ui', 11, 'bold'),background=cadre, fg=letter)
-        self.sign_label.place(x=500, y=490)
-
-        # Create Account Button ------------------------------------
-        button = CTkButton(master=self.frame,text='Create Account',corner_radius=32,fg_color='#2BB069',hover_color='#C850C0',width=200,font=head3,command=self.show_create_user)
-        button.place(x=500,y=520)
-
-    #Connection panel : create user
-    def show_create_user(self):
-        self.frame.destroy()  # Supprimer le cadre actuel
-        
-        # Cadre principal ---------------------------------------
-        self.frame = CTkFrame(self.master,width=950,height=600,corner_radius=30,fg_color=cadre,bg_color='#1A324C')
-        self.frame.place(x=200,y=70)
-
-        #Introduction : 1 -----------------------------------------
-        txt = "We'll create your account for you !"
-        self.heading_1 = Label(self.frame, text=txt, font=head1, bg=cadre, fg=letter, justify=LEFT)
-        self.heading_1.place(x=-51, y=30, width=800, height=200)
-
-         # Sous-titre ----------------------------------------------
-        subtitle_txt = "Join us today to enjoy exclusive benefits and stay updated!"
-        self.subtitle = Label(self.frame, text=subtitle_txt, font=head2, bg=cadre, fg=letter, justify=LEFT)
-        self.subtitle.place(x=0, y=145, width=800, height=30)
-
-        
-
-        # User Image Panel ----------------------------------------------------
-        image = Image.open("Images\\user.png")
-        image = image.resize((60,60))
-        image = ImageTk.PhotoImage(image)
-        label = Label(self.frame, image=image,borderwidth=0,bg=cadre)
-        label.image = image  # Référence nécessaire pour empêcher la collecte des déchets
-        label.place(x=600, y=190)
-
-        # Sign Up Label -------------------------------------------------
-        self.sign_in_label = Label(self.frame, text='Sign Up',bg=cadre,fg=letter,font=head2)
-        self.sign_in_label.place(x=598, y=255)
-
-        # Username ------------------------------------------------------
-        self.username_label = Label(self.frame, text='Username', bg=cadre, font=('yu gothic ui', 13, 'bold'),fg=letter)
-        self.username_label.place(x=500, y=300)
-        self.username_entry = Entry(self.frame, highlightthickness=0, relief=FLAT, bg=cadre, fg=letter,
-        font=('yu gothic ui', 12, 'bold'))
-        self.username_entry.place(x=525, y=332, width=270)
-        self.username_line = Canvas(self.frame, width=300, height=2.0, bg='#bdb9b1', highlightthickness=0)
-        self.username_line.place(x=500, y=359)
-
-        # User laber logo ----------------------------------------------
-        username_icon = Image.open('images/user_label.png')
-        resized_icon = username_icon.resize((20, 20))
-        photo_user = ImageTk.PhotoImage(resized_icon)
-        self.username_icon_label = Label(self.frame, image=photo_user, bg=cadre)
-        self.username_icon_label.image = photo_user
-        self.username_icon_label.place(x=500, y=332)
-
-        # Password ------------------------------------------------------
-        self.passwd_label = Label(self.frame, text='Password', bg=cadre, font=('yu gothic ui', 13, 'bold'),fg=letter)
-        self.passwd_label.place(x=500, y=370)
-        self.passwd_entry = Entry(self.frame, highlightthickness=0, relief=FLAT, bg=cadre, fg=letter,
-        font=('yu gothic ui', 12, 'bold'),show="*")
-        self.passwd_entry.place(x=525, y=403, width=270)
-        self.passwd_line = Canvas(self.frame, width=300, height=2.0, bg='#bdb9b1', highlightthickness=0)
-        self.passwd_line.place(x=500, y=430)
-
-        # Password laber logo ----------------------------------------------
-        passwd_icon = Image.open('images/lock.png')
-        resized_icon = passwd_icon.resize((20, 20))
-        photo_passwd = ImageTk.PhotoImage(resized_icon)
-        self.passwd_icon_label = Label(self.frame, image=photo_passwd, bg=cadre)
-        self.passwd_icon_label.image = photo_passwd
-        self.passwd_icon_label.place(x=500, y=403)
-
-        # Confirm Password ------------------------------------------------------
-        self.confirm_passwd_label = Label(self.frame, text='Confirm Password', bg=cadre, font=('yu gothic ui', 13, 'bold'),fg=letter)
-        self.confirm_passwd_label.place(x=500, y=440)
-        self.confirm_passwd_entry = Entry(self.frame, highlightthickness=0, relief=FLAT, bg=cadre, fg=letter,
-        font=('yu gothic ui', 12, 'bold'),show="*")
-        self.confirm_passwd_entry.place(x=525, y=470, width=300)
-        self.confirm_passwd_line = Canvas(self.frame, width=300, height=2.0, bg='#bdb9b1', highlightthickness=0)
-        self.confirm_passwd_line.place(x=500, y=497)
-
-        # Confirm Password laber logo ----------------------------------------------
-        passwd_icon = Image.open('images/lock.png')
-        resized_icon = passwd_icon.resize((20, 20))
-        photo_passwd = ImageTk.PhotoImage(resized_icon)
-        self.passwd_icon_label = Label(self.frame, image=photo_passwd, bg=cadre)
-        self.passwd_icon_label.image = photo_passwd
-        self.passwd_icon_label.place(x=500, y=470)
-
-        # Create Button ------------------------------------
-        button = CTkButton(master=self.frame,text='Create',corner_radius=32,fg_color='#4158D0',hover_color='#C850C0',width=300,font=head3,command=self.create_user)
-        button.place(x=500,y=520)
-        # Return Button ------------------------------------
-        button = CTkButton(master=self.frame,text='Back to Login',corner_radius=32,fg_color='#4158D0',hover_color='#C850C0',width=300,font=head3,command=self.back_to_login)
-        button.place(x=500,y=560)
-
-       # GIF Animation
-        gif_path = 'videos/create_account.gif'
+        # GIF Animation Star ------------------------------------------
+        gif_path = 'videos/star_effect.gif'
 
         def get_frames(gif_path):
             frames = []
@@ -274,11 +128,201 @@ class LoginWindow:
             if ind == frameCnt:
                 ind = 0
             gif_label.configure(image=frame, bg=cadre)
-            self.frame.after(50, update, ind)
+            self.frame.after(90, update, ind)
 
         gif_label = Label(self.frame, bg=cadre)
-        gif_label.place(x=160, y=250)  # Positionnement du GIF
+        gif_label.place(x=182, y=180)  # Positionnement du GIF
         self.frame.after(0, update, 0)
+
+        # Left Image ----------------------------------------------
+        image_path = "Images\login_interface.png"
+        image = Image.open(image_path)
+        image = image.resize((260,260))
+        image = ImageTk.PhotoImage(image)
+        label = Label(self.frame, image=image,borderwidth=0,bg=cadre)
+        label.image = image  # Référence nécessaire pour empêcher la collecte des déchets
+        label.place(x=110, y=250)
+
+        # User Image Panel ----------------------------------------------------
+        image = Image.open("Images\\user.png")
+        image = image.resize((60,60))
+        image = ImageTk.PhotoImage(image)
+        label = Label(self.frame, image=image,borderwidth=0,bg=cadre)
+        label.image = image  # Référence nécessaire pour empêcher la collecte des déchets
+        label.place(x=620, y=190)
+
+        # Sign Up Label -------------------------------------------------
+        self.sign_in_label = Label(self.frame, text='Sign In',bg=cadre,fg=letter,font=head4)
+        self.sign_in_label.place(x=624, y=255)
+
+        # Username ------------------------------------------------------
+        self.username_label = Label(self.frame, text='Username', bg=cadre, font=('yu gothic ui', 13, 'bold'),fg=letter)
+        self.username_label.place(x=500, y=280)
+        self.username_entry = Entry(self.frame, highlightthickness=0, relief=FLAT, bg=cadre, fg='#D4D4D4',font=('yu gothic ui', 12))
+        self.username_entry.place(x=525, y=312, width=270)
+        self.username_line = Canvas(self.frame, width=300, height=2.0, bg='#bdb9b1', highlightthickness=0)
+        self.username_line.place(x=500, y=339)
+
+        # User laber logo ----------------------------------------------
+        username_icon = Image.open('images/user_label.png')
+        resized_icon = username_icon.resize((20, 20))
+        photo_user = ImageTk.PhotoImage(resized_icon)
+        self.username_icon_label = Label(self.frame, image=photo_user, bg=cadre)
+        self.username_icon_label.image = photo_user
+        self.username_icon_label.place(x=500, y=312)
+
+        # Password ------------------------------------------------------
+        self.passwd_label = Label(self.frame, text='Password', bg=cadre, font=('yu gothic ui', 13, 'bold'),fg=letter)
+        self.passwd_label.place(x=500, y=350)
+        self.passwd_entry = Entry(self.frame, highlightthickness=0, relief=FLAT, bg=cadre, fg='#D4D4D4',font=('yu gothic ui', 12),show="*")
+        self.passwd_entry.place(x=525, y=383, width=270)
+        self.passwd_line = Canvas(self.frame, width=300, height=2.0, bg='#bdb9b1', highlightthickness=0)
+        self.passwd_line.place(x=500, y=410)
+
+        # Password laber logo ----------------------------------------------
+        passwd_icon = Image.open('images/lock.png')
+        resized_icon = passwd_icon.resize((20, 20))
+        photo_passwd = ImageTk.PhotoImage(resized_icon)
+        self.passwd_icon_label = Label(self.frame, image=photo_passwd, bg=cadre)
+        self.passwd_icon_label.image = photo_passwd
+        self.passwd_icon_label.place(x=500, y=383)
+
+        # Login Button ------------------------------------
+        button = CTkButton(master=self.frame,text='Login',corner_radius=32,fg_color='#4158D0',hover_color='#C850C0',width=300,font=head3,command=self.authenticate)
+        button.place(x=500,y=435)
+
+        # No account Label ---------------------------------------
+        self.sign_label = Label(self.frame, text='No account yet?', font=('yu gothic ui', 11, 'bold'),background=cadre, fg=letter)
+        self.sign_label.place(x=500, y=490)
+
+        # Create Account Button ------------------------------------
+        button = CTkButton(master=self.frame,text='Create Account',corner_radius=32,fg_color='#318A4C',hover_color='#C850C0',width=200,font=head3,command=self.show_create_user)
+        button.place(x=500,y=520)
+
+    #Connection panel : create user
+    def show_create_user(self):
+        self.frame.destroy()  # Supprimer le cadre actuel
+
+        # Cadre principal ------------------------------------------------
+        self.frame = CTkFrame(self.master,width=950,height=600,corner_radius=30,fg_color=cadre,bg_color='#1A324C')
+        self.frame.place(x=200,y=70)
+
+        # Title ---------------------------------------------------------
+        head = "Account Creation"
+        self.heading_1 = Label(self.frame, text=head, font=head1, bg=cadre, fg=letter, justify=LEFT,anchor="nw")
+        self.heading_1.place(relx=0.065, rely=0.08, width=1000, height=100)
+
+
+        #Introduction : 1 -----------------------------------------
+        txt = "Join us today to enjoy exclusive benefits and stay updated!"
+        self.heading_1 = Label(self.frame, text=txt, font=head2, bg=cadre, fg=letter, justify=LEFT,anchor="nw")
+        self.heading_1.place(relx=0.065, y=90, width=1000, height=100)
+
+        # GIF Animation Star ------------------------------------------
+        gif_path = 'videos/create_account.gif'
+
+        def get_frames(gif_path):
+            frames = []
+            with Image.open(gif_path) as img:
+                try:
+                    while True:
+                        frame = img.copy().convert("RGBA")
+                        frame = frame.resize((190, 190))
+                        frames.append(ImageTk.PhotoImage(frame))
+                        img.seek(img.tell() + 1)
+                except EOFError:
+                    pass
+            return frames
+
+        frames = get_frames(gif_path)
+        frameCnt = len(frames)
+
+        def update(ind):
+            frame = frames[ind]
+            ind += 1
+            if ind == frameCnt-30:
+                ind = 0
+            gif_label.configure(image=frame, bg=cadre)
+            self.frame.after(70, update, ind)
+
+        gif_label = Label(self.frame, bg=cadre)
+        gif_label.place(x=150, y=220)  # Positionnement du GIF
+        self.frame.after(0, update, 0)
+
+        # User Image Panel ----------------------------------------------------
+        image = Image.open("Images\\user.png")
+        image = image.resize((60,60))
+        image = ImageTk.PhotoImage(image)
+        label = Label(self.frame, image=image,borderwidth=0,bg=cadre)
+        label.image = image  # Référence nécessaire pour empêcher la collecte des déchets
+        label.place(x=620, y=160)
+
+        # Sign Up Label -------------------------------------------------
+        self.sign_in_label = Label(self.frame, text='Sign In',bg=cadre,fg=letter,font=head4)
+        self.sign_in_label.place(x=624, y=225)
+
+        # Username ------------------------------------------------------
+        self.username_label = Label(self.frame, text='Username', bg=cadre, font=('yu gothic ui', 13, 'bold'),fg=letter)
+        self.username_label.place(x=500, y=250)
+        self.username_entry = Entry(self.frame, highlightthickness=0, relief=FLAT, bg=cadre, fg='#D4D4D4',font=('yu gothic ui', 12))
+        self.username_entry.place(x=525, y=282, width=270)
+        self.username_line = Canvas(self.frame, width=300, height=2.0, bg='#bdb9b1', highlightthickness=0)
+        self.username_line.place(x=500, y=309)
+
+        # User laber logo ----------------------------------------------
+        username_icon = Image.open('images/user_label.png')
+        resized_icon = username_icon.resize((20, 20))
+        photo_user = ImageTk.PhotoImage(resized_icon)
+        self.username_icon_label = Label(self.frame, image=photo_user, bg=cadre)
+        self.username_icon_label.image = photo_user
+        self.username_icon_label.place(x=500, y=282)
+
+        # Password ------------------------------------------------------
+        self.passwd_label = Label(self.frame, text='Password', bg=cadre, font=('yu gothic ui', 13, 'bold'),fg=letter)
+        self.passwd_label.place(x=500, y=320)
+        self.passwd_entry = Entry(self.frame, highlightthickness=0, relief=FLAT, bg=cadre, fg='#D4D4D4',font=('yu gothic ui', 12),show="*")
+        self.passwd_entry.place(x=525, y=353, width=270)
+        self.passwd_line = Canvas(self.frame, width=300, height=2.0, bg='#bdb9b1', highlightthickness=0)
+        self.passwd_line.place(x=500, y=380)
+
+        # Password laber logo ----------------------------------------------
+        passwd_icon = Image.open('images/lock.png')
+        resized_icon = passwd_icon.resize((20, 20))
+        photo_passwd = ImageTk.PhotoImage(resized_icon)
+        self.passwd_icon_label = Label(self.frame, image=photo_passwd, bg=cadre)
+        self.passwd_icon_label.image = photo_passwd
+        self.passwd_icon_label.place(x=500, y=353)
+
+        # Confirm Password ------------------------------------------------------
+        self.passwd_label = Label(self.frame, text='Confirm Password', bg=cadre, font=('yu gothic ui', 13, 'bold'),fg=letter)
+        self.passwd_label.place(x=500, y=390)
+        self.confirm_passwd_entry = Entry(self.frame, highlightthickness=0, relief=FLAT, bg=cadre, fg='#D4D4D4',font=('yu gothic ui', 12),show="*")
+        self.confirm_passwd_entry.place(x=525, y=413, width=270)
+        self.passwd_line = Canvas(self.frame, width=300, height=2.0, bg='#bdb9b1', highlightthickness=0)
+        self.passwd_line.place(x=500, y=450)
+
+        # Confirm Password laber logo ----------------------------------------------
+        passwd_icon = Image.open('images/lock.png')
+        resized_icon = passwd_icon.resize((20, 20))
+        photo_passwd = ImageTk.PhotoImage(resized_icon)
+        self.passwd_icon_label = Label(self.frame, image=photo_passwd, bg=cadre)
+        self.passwd_icon_label.image = photo_passwd
+        self.passwd_icon_label.place(x=500, y=413)
+
+        # Login Button ------------------------------------
+        button = CTkButton(master=self.frame,text='Create',corner_radius=32,fg_color='#4158D0',hover_color='#C850C0',width=300,font=head3,command=self.authenticate)
+        button.place(x=500,y=475)
+
+        # BOUTON-------------------------------------------
+        button = Image.open("Images\logo_next_before.png")
+        resized_image = button.resize((60, 60))
+        # Convertir l'image redimensionnée en format ImageTk.PhotoImage
+        image = ImageTk.PhotoImage(resized_image)
+        # Créer le bouton avec l'image redimensionnée
+        self.roundedbutton = tk.Button(self.frame, image=image, bd=0, borderwidth=0,bg=cadre,command=self.show_authentication)
+        self.roundedbutton.image = image  # Gardez une référence à l'image pour éviter la collecte des déchets
+        self.roundedbutton.place(relx=0.065, y=450)
+        #-----------------------------------------------------
 
     #Connection panel : back to login
     def back_to_login(self):
@@ -327,7 +371,7 @@ class LoginWindow:
 
         self.enter_code_label = tk.Label(self.frame, text="Enter room code", font=head1, bg=cadre, fg=letter)
         self.enter_code_label.place(relx=0.5, rely=0.22, anchor=tk.CENTER)
-        code_entry = CTkEntry(master=self.frame, corner_radius=20, fg_color='#ffffff', text_color=letter, width=200, height=55, font=('Lexend', 30))
+        code_entry = CTkEntry(master=self.frame, corner_radius=20, fg_color='black', text_color=letter, width=200, height=55, font=('Lexend', 30))
         code_entry.place(relx=0.5, rely=0.3, anchor=tk.CENTER)
         button_join = CTkButton(master=self.frame, text='Join a room', corner_radius=32, fg_color=button, hover_color=hover_button,text_color=letter_button, width=200, font=('Lexend', 30, 'bold'), command=self.show_config)
         button_join.place(relx=0.5, rely=0.4, anchor=tk.CENTER)
