@@ -236,19 +236,6 @@ class LoginWindow:
         self.frame = tk.Frame(self.master,bg='#152242',width=950,height=600)
         self.frame.place(x=200,y=70)
 
-        self.ip_label = tk.Label(self.frame, text="Adresse IP du serveur:", bg='#152242', fg="white")
-        self.ip_label.pack(pady=5)
-        self.ip_entry = tk.Entry(self.frame)
-        self.ip_entry.pack(pady=5)
-        
-        self.port_label = tk.Label(self.frame, text="Port:", bg='#152242', fg="white")
-        self.port_label.pack(pady=5)
-        self.port_entry = tk.Entry(self.frame)
-        self.port_entry.pack(pady=5)
-        
-        self.connect_button = tk.Button(self.frame, text="Connecter", command=self.connect_chatroom, font=head4_button)
-        self.connect_button.pack(pady=5)
-
     #ALERT : Connection Success
     def connect_chatroom(self):
         ip = self.ip_entry.get()
