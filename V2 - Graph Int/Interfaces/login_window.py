@@ -366,38 +366,62 @@ class LoginWindow:
         self.frame = CTkFrame(self.master,width=950,height=600,corner_radius=30,fg_color=cadre,bg_color='#1A324C')
         self.frame.place(x=200,y=70)
 
-        self.label = tk.Label(self.frame, text="To connect with your friends, enter their code or generate a new one.", font=head2, bg=cadre, fg=letter)
-        self.label.place(relx=0.5, rely=0.85, anchor=tk.CENTER)
+        self.title_label = tk.Label(self.frame, text="Join a room to chat with your friends !", font=head1, bg=cadre, fg=letter)
+        self.title_label.place(relx=0.5, rely=0.12, anchor=tk.CENTER)
 
-        self.enter_code_label = tk.Label(self.frame, text="Enter room code", font=head1, bg=cadre, fg=letter)
-        self.enter_code_label.place(relx=0.5, rely=0.22, anchor=tk.CENTER)
-        code_entry = CTkEntry(master=self.frame, corner_radius=20, fg_color='black', text_color=letter, width=200, height=55, font=('Lexend', 30))
-        code_entry.place(relx=0.5, rely=0.3, anchor=tk.CENTER)
-        button_join = CTkButton(master=self.frame, text='Join a room', corner_radius=32, fg_color=button, hover_color=hover_button,text_color=letter_button, width=200, font=('Lexend', 30, 'bold'), command=self.show_config)
-        button_join.place(relx=0.5, rely=0.4, anchor=tk.CENTER)
+        image_path = "Images\\phone.png"
+        image = Image.open(image_path)
+        image = image.resize((230,230))
+        image = ImageTk.PhotoImage(image)
+        label = Label(self.frame, image=image, borderwidth=0, bg=cadre)
+        label.image = image  # Référence nécessaire pour empêcher la collecte des déchets
+        label.place(relx=0.27, rely=0.5, anchor=tk.CENTER)
+
+        self.enter_code_label = tk.Label(self.frame, text="Enter room code", font=head2, bg=cadre, fg=letter)
+        self.enter_code_label.place(relx=0.67, rely=0.27, anchor=tk.CENTER)
+        code_entry = CTkEntry(master=self.frame, corner_radius=20, fg_color='#ffffff', text_color="black", width=200, height=55, font=('Lexend', 30))
+        code_entry.place(relx=0.67, rely=0.35, anchor=tk.CENTER)
+        button_join = CTkButton(master=self.frame, text='Join', corner_radius=32, fg_color=button, hover_color=hover_button,text_color=letter_button, width=200, font=('Lexend', 30, 'bold'), command=self.show_config)
+        button_join.place(relx=0.67, rely=0.45, anchor=tk.CENTER)
 
         self.or_label = tk.Label(self.frame, text="or", font=('Lexend', 20), bg=cadre, fg=letter)
-        self.or_label.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+        self.or_label.place(relx=0.67, rely=0.55, anchor=tk.CENTER)
 
         self.button_generate = CTkButton(master=self.frame, text='Generate a code', corner_radius=32,fg_color=button, hover_color=hover_button, width=200, text_color=letter_button,font=('Lexend', 30, 'bold'), command=self.generate_code)
-        self.button_generate.place(relx=0.5, rely=0.6, anchor=tk.CENTER)
+        self.button_generate.place(relx=0.67, rely=0.65, anchor=tk.CENTER)
         self.code_label = tk.Label(self.frame, text="", font=('Lexend', 30), bg=cadre, fg='white')
-        self.code_label.place(relx=0.5, rely=0.7, anchor=tk.CENTER)
+
+        self.label = tk.Label(self.frame, text="To connect with your friends, enter their code or generate a new one", font=('Lexend', 15), bg=cadre, fg=letter)
+        self.label.place(relx=0.5, rely=0.90, anchor=tk.CENTER)
+
 
     def generate_code(self):
         # Générer un code aléatoire de 8 caractères
-        code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+        code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=7))
         self.code_label.config(text=code)
+        self.code_label.place(relx=0.67, rely=0.65, anchor=tk.CENTER)
         print("Code généré:", code)  # Debugging
 
         # Supprimer le bouton existant
         self.button_generate.destroy()
 
         # Créer un nouveau bouton avec le texte et la commande mis à jour
-        self.button_enter_room = CTkButton(master=self.frame, text='Enter room', corner_radius=32, fg_color=button, text_color=letter_button,
-                                           hover_color=hover_button, width=200, font=('Lexend', 30, 'bold'),
-                                           command=self.connect_chatroom)
-        self.button_enter_room.place(relx=0.5, rely=0.6, anchor=tk.CENTER)
+        self.button_enter_room = CTkButton(master=self.frame, text='Enter room', corner_radius=32, fg_color="#FE9900", text_color=letter_button,hover_color="#C27602", width=200, font=('Lexend', 30, 'bold'),command=self.connect_chatroom)
+        self.button_enter_room.place(relx=0.67, rely=0.75, anchor=tk.CENTER)
+
+        copy_image_path = "Images\\copy.png"
+        copy_image = Image.open(copy_image_path).convert("RGBA")
+        copy_image = copy_image.resize((20, 20))
+        copy_image = ImageTk.PhotoImage(copy_image)
+
+        self.button_copy_code = CTkButton(master=self.frame, image=copy_image, text='', corner_radius=5, fg_color="#040D15",hover_color=hover_button, width=20, font=('Lexend', 15, 'bold'),command=lambda: self.copy_to_clipboard(code))
+        self.button_copy_code.place(relx=0.81, rely=0.65, anchor=tk.CENTER)
+
+    def copy_to_clipboard(self, code):
+        self.master.clipboard_clear()
+        self.master.clipboard_append(code)
+        self.master.update()
+
     #ALERT : Connection Success
     def connect_chatroom(self):
         ip = self.ip_entry.get()
