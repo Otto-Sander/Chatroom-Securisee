@@ -428,5 +428,4 @@ class LoginWindow:
         port = self.port_entry.get()
         # Code pour connecter à la chatroom en utilisant l'adresse IP et le port fournis
         tk.messagebox.showinfo("Info", "Connecté à la chatroom avec succès.")
-        self.master.destroy()
-        open_chatroom()
+        open_chatroom(self)
