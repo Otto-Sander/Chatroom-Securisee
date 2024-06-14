@@ -54,7 +54,7 @@ def open_chatroom():
 
     def display_message(chat_box, user, message):
         current_time = datetime.datetime.now()
-        current_time_string = current_time.strftime("%H:%M:%S")
+        current_time_string = current_time.strftime("%H:%M")
 
         if user == "Moi":
             bg_color = "#222222"  # Gris foncé pour l'utilisateur actuel
