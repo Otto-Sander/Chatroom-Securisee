@@ -433,7 +433,7 @@ class LoginWindow:
         # client.enter_server((ip,port))
         # Code pour connecter à la chatroom en utilisant l'adresse IP et le port fournis
         ip = "10.0.0.12"
-        port = 28024
+        port = 31077
         open_chatroom(ip,port)
         tk.messagebox.showinfo("Info", "Connecté à la chatroom avec succès.")
 
