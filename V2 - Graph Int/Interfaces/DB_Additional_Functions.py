@@ -1,4 +1,4 @@
-from CRUD_Functions import *
+from DB_CRUD_Functions import *
 
 #Fonction qui vérifie si un utilisateur existe dans la database
 def is_user_in_database(client, username):

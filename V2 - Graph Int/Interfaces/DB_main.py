@@ -5,14 +5,12 @@ import os
 
 from supabase import create_client
 
-from CRUD_Functions import *
-from Additional_Functions import *
+from DB_Additional_Functions import *
 
-if __name__ == '__main__':
-    #Créer le client
-    url = os.environ.get("SUPABASE_URL")
-    key = os.environ.get("SUPABASE_KEY")
-    supabase = create_client(url, key)
+
+url = os.environ.get("SUPABASE_URL")
+key = os.environ.get("SUPABASE_KEY")
+supabase = create_client(url, key)
 
 
     ##FONCTIONS DE TESTS
