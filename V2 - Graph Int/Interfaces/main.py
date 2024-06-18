@@ -9,6 +9,12 @@ Fonctionnalités :
 - Initialisation de l'application.
 - Affichage de la fenêtre de connexion en utilisant la classe LoginWindow.
 """
+from dotenv import load_dotenv
+load_dotenv()
+
+import os
+
+from supabase import create_client
 
 import tkinter as tk
 from main_interface import MainInterface

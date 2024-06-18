@@ -13,6 +13,7 @@ Fonctionnalités :
 - Options pour se connecter ou créer un nouveau compte.
 - Connexion à une salle de chat sécurisée après l'authentification.
 """
+from DB_main import supabase
 from PIL import Image,ImageTk
 from tkinter import *
 import tkinter as tk
@@ -27,6 +28,9 @@ import threading
 import sys
 import os
 import client
+from DB_Additional_Functions import *
+from DB_CRUD_Functions import *
+
 
 # ------------------------ Graphic DESIGN ------------------------------------------------------
 cadre = '#0A1A29'
@@ -48,6 +52,7 @@ head4_button = ("Lexend", 9)
 class MainInterface:
     #Introduction PANEL --------------------------------------------------------------------------------------------
     def __init__(self, master):
+        self.supabase = supabase
         self.master = master
         self.master.title("Authentification")
 
@@ -86,7 +91,7 @@ class MainInterface:
         # Convertir l'image redimensionnée en format ImageTk.PhotoImage
         image = ImageTk.PhotoImage(resized_image)
         # Créer le bouton avec l'image redimensionnée
-        self.roundedbutton = tk.Button(self.frame, image=image, bd=0, borderwidth=0,bg=cadre,command=self.show_home)
+        self.roundedbutton = tk.Button(self.frame, image=image, bd=0, borderwidth=0,bg=cadre,command=self.show_authentication)
         self.roundedbutton.image = image  # Gardez une référence à l'image pour éviter la collecte des déchets
         self.roundedbutton.place(x=720, y=450)
         #-----------------------------------------------------
@@ -317,7 +322,7 @@ class MainInterface:
         self.passwd_icon_label.place(x=500, y=413)
 
         # Login Button ------------------------------------
-        button = CTkButton(master=self.frame,text='Create',corner_radius=32,fg_color='#4158D0',hover_color='#C850C0',width=300,font=head3,command=self.authenticate)
+        button = CTkButton(master=self.frame,text='Create',corner_radius=32,fg_color='#4158D0',hover_color='#C850C0',width=300,font=head3,command=self.create_user)
         button.place(x=500,y=475)
 
         # BOUTON-------------------------------------------
@@ -401,6 +406,7 @@ class MainInterface:
     def create_user(self):
         new_username = self.username_entry.get()
         new_password = self.passwd_entry.get()
+        #new_mail = self.mail_entry.get()
         confirm_password = self.confirm_passwd_entry.get()
 
         if new_password != confirm_password:
@@ -410,8 +416,23 @@ class MainInterface:
         else:
             # Enregistrer le nouvel utilisateur (code à implémenter)
             # Par exemple, vous pouvez enregistrer les informations dans une base de données ou un fichier.
+            existing_users = get_user_all(supabase, new_username)
+            if existing_users:
+                tk.messagebox.showerror("Erreur", "Le nom d'utilisateur existe déjà.")
+                return
+            #existing_emails = supabase.table("utilisateurs").select("*").eq("mail", new_mail).execute().data
+            #if existing_emails:
+            #    tk.messagebox.showerror("Erreur", "L'email existe déjà.")
+            #    return
+
+            # Hacher le mot de passe
+            hashed_password = self.password_hash(new_password)
+            hashed_password_str = hashed_password.decode('utf-8')
+
+            # Enregistrer le nouvel utilisateur
+            add_user(supabase, new_username, hashed_password_str, None)
             tk.messagebox.showinfo("Succès", "Compte créé avec succès !")
-            self.back_to_login()  # Retour à la page de connexion après la création de compte
+            self.back_to_login() # Retour à la page de connexion après la création de compte
 
     def password_hash(self, password):
         return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
@@ -426,9 +447,15 @@ class MainInterface:
     def authenticate(self):
         username = self.username_entry.get()
         password = self.passwd_entry.get()
-        if username == "admin" and password == "admin":
-            self.frame.destroy()  # Fermer l'ancienne interface
-            self.show_home()
+        existing_user = get_user_all(supabase, username)
+        if existing_user:
+            # Vérifier le mot de passe
+            hash_password = get_password(supabase, username)
+            if self.check_password(password, hash_password.encode('utf-8')):
+                self.frame.destroy()  # Fermer l'ancienne interface
+                self.show_config()
+            else:
+                tk.messagebox.showerror("Erreur", "Nom d'utilisateur ou mot de passe incorrect.")
         else:
             tk.messagebox.showerror("Erreur", "Nom d'utilisateur ou mot de passe incorrect.")
 
@@ -437,7 +464,6 @@ class MainInterface:
         code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=7))
         self.code_label.config(text=code)
         self.code_label.place(relx=0.67, rely=0.65, anchor=tk.CENTER)
-        print("Code généré:", code)  # Debugging
 
         # Supprimer le bouton existant
         self.button_generate.destroy()
@@ -446,10 +472,13 @@ class MainInterface:
         self.button_enter_room = CTkButton(master=self.frame, text='Enter room', corner_radius=32, fg_color="#FE9900", text_color=letter_button,hover_color="#C27602", width=200, font=('Lexend', 30, 'bold'),command=self.connect_chatroom)
         self.button_enter_room.place(relx=0.67, rely=0.75, anchor=tk.CENTER)
 
-        copy_image_path = "..\\Images\\copy.png"
+        copy_image_path = "Images\\copy.png"
         copy_image = Image.open(copy_image_path).convert("RGBA")
         copy_image = copy_image.resize((20, 20))
         copy_image = ImageTk.PhotoImage(copy_image)
+
+        #Changer la méthode pour récupérer les IP et port
+        #add_session(supabase, code, None, None, "IP_privee_here", 12345)
 
         self.button_copy_code = CTkButton(master=self.frame, image=copy_image, text='', corner_radius=5, fg_color="#040D15",hover_color=hover_button, width=20, font=('Lexend', 15, 'bold'),command=self.copy_to_clipboard(code))
         self.button_copy_code.place(relx=0.81, rely=0.65, anchor=tk.CENTER)
@@ -462,12 +491,22 @@ class MainInterface:
 # ------------------------------------------------- Connection ------------------------------------------
 
     #ALERT : Connection Success
-    def connect_Client(option):
-        # Connect to the server
-        # client.enter_server((ip,port))
-        # Code pour connecter à la chatroom en utilisant l'adresse IP et le port fournis
-        ip = "10.0.0.12"
-        port = 31077
-        open_chatroom(ip,port)
-        tk.messagebox.showinfo("Info", "Connecté à la chatroom avec succès.")
+    def connect_chatroom(self):
+        code = self.code_entry.get()
+        if code:
+            try:
+                # Récupérer les informations de session à partir du code
+                ip_public = get_IP_public(supabase, code)
+                port_server = get_Port_Server(supabase, code)
+                ip_privee = get_IP_privee(supabase, code)
+                port_privee = get_Port_privee(supabase, code)
+
+                # Connecter à la chatroom en utilisant les informations récupérées
+                open_chatroom(ip_privee, port_privee)
+
+                tk.messagebox.showinfo("Info", "Connecté à la chatroom avec succès.")
+            except IndexError:
+                tk.messagebox.showerror("Erreur", "Code de session invalide.")
+        else:
+            tk.messagebox.showerror("Erreur", "Veuillez entrer un code de session.")
 
