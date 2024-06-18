@@ -21,6 +21,7 @@ from PIL import ImageTk, Image
 from customtkinter import *
 import random
 import string
+import bcrypt
 import server
 import threading
 import sys
@@ -77,6 +78,7 @@ class MainInterface:
         txt_intro3 = "MasterCamp is your secure space to share documents\nand chat with complete confidentiality.Protect your\nexchanges with our encrypted communication and\ndetailed access management. Simplify your\nsensitive projects with MasterCamp!"
         self.heading_3 = Label(self.frame, text=txt_intro3, font=head3, bg=cadre, fg=letter, justify=LEFT,anchor="w")
         self.heading_3.place(relx=0.45, rely=0.32, width=400, height=200)
+
 
         # BOUTON-------------------------------------------
         button = Image.open("Images\logo_next.png")
@@ -410,6 +412,15 @@ class MainInterface:
             # Par exemple, vous pouvez enregistrer les informations dans une base de données ou un fichier.
             tk.messagebox.showinfo("Succès", "Compte créé avec succès !")
             self.back_to_login()  # Retour à la page de connexion après la création de compte
+
+    def password_hash(self, password):
+        return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+
+    def check_password(self, password, hashed_password):
+        # Check hashed password. Using bcrypt, the salt is saved into the hash itself
+        return bcrypt.checkpw(password.encode('utf-8'), hashed_password)
+
+
 
     #ALERT : Create Connection failed
     def authenticate(self):
