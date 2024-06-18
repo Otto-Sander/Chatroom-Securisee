@@ -22,6 +22,15 @@ if __name__ == '__main__':
     #data = get_user_all(supabase, "Boooo")
     #data = get_password(supabase, "Booo")
     #data = get_mail(supabase, "Booo")
+    #data = get_id(supabase,"Neith")
     #print(data)
 
-    #is_in_database(supabase, "Neith")
+    #data = update_user(supabase, "Booo", "Boubou", "TEst", "pop@gmail.com")
+    #data = update_username(supabase, "Neith", "Neith12")
+    #data = update_password(supabase, "Neith12", "AAAHH15")
+
+    #data = delete_user(supabase, "Neith12")
+    #data = delete_session(supabase, 45687)
+
+    #is_user_in_database(supabase, "Neith")
+    #is_session_in_database(supabase, 45687)
