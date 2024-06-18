@@ -21,6 +21,11 @@ from PIL import ImageTk, Image
 from customtkinter import *
 import random
 import string
+import server
+import threading
+import sys
+import os
+import client
 
 # ------------------------ Graphic DESIGN ------------------------------------------------------
 cadre = '#0A1A29'
@@ -381,7 +386,7 @@ class LoginWindow:
         self.enter_code_label.place(relx=0.67, rely=0.27, anchor=tk.CENTER)
         code_entry = CTkEntry(master=self.frame, corner_radius=20, fg_color='#ffffff', text_color="black", width=200, height=55, font=('Lexend', 30))
         code_entry.place(relx=0.67, rely=0.35, anchor=tk.CENTER)
-        button_join = CTkButton(master=self.frame, text='Join', corner_radius=32, fg_color=button, hover_color=hover_button,text_color=letter_button, width=200, font=('Lexend', 30, 'bold'), command=self.show_config)
+        button_join = CTkButton(master=self.frame, text='Join', corner_radius=32, fg_color=button, hover_color=hover_button,text_color=letter_button, width=200, font=('Lexend', 30, 'bold'),command=self.connect_Client())
         button_join.place(relx=0.67, rely=0.45, anchor=tk.CENTER)
 
         self.or_label = tk.Label(self.frame, text="or", font=('Lexend', 20), bg=cadre, fg=letter)
@@ -406,7 +411,7 @@ class LoginWindow:
         self.button_generate.destroy()
 
         # Créer un nouveau bouton avec le texte et la commande mis à jour
-        self.button_enter_room = CTkButton(master=self.frame, text='Enter room', corner_radius=32, fg_color="#FE9900", text_color=letter_button,hover_color="#C27602", width=200, font=('Lexend', 30, 'bold'),command=self.connect_chatroom)
+        self.button_enter_room = CTkButton(master=self.frame, text='Enter room', corner_radius=32, fg_color="#FE9900", text_color=letter_button,hover_color="#C27602", width=200, font=('Lexend', 30, 'bold'),command=self.connect_chatroom_hostClient)
         self.button_enter_room.place(relx=0.67, rely=0.75, anchor=tk.CENTER)
 
         copy_image_path = "Images\\copy.png"
@@ -423,9 +428,12 @@ class LoginWindow:
         self.master.update()
 
     #ALERT : Connection Success
-    def connect_chatroom(self):
-        ip = self.ip_entry.get()
-        port = self.port_entry.get()
+    def connect_Client(option):
+        # Connect to the server
+        # client.enter_server((ip,port))
         # Code pour connecter à la chatroom en utilisant l'adresse IP et le port fournis
+        ip = "10.0.0.12"
+        port = 31077
+        open_chatroom(ip,port)
         tk.messagebox.showinfo("Info", "Connecté à la chatroom avec succès.")
-        open_chatroom(self)
+
