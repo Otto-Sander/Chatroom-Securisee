@@ -9,8 +9,9 @@ Fonctionnalités :
 - Initialisation de l'application.
 - Affichage de la fenêtre de connexion en utilisant la classe LoginWindow.
 """
+
 import tkinter as tk
-from login_window import LoginWindow
+from main_interface import MainInterface
 from tkinter import *
 from PIL import ImageTk, Image
 
@@ -26,5 +27,5 @@ if __name__ == "__main__":
     label = Label(root,image=background_image)
     label.place(x=0,y=0,relwidth=1,relheight=1)
     #Lance l'application
-    app = LoginWindow(root)
+    app = MainInterface(root)
     root.mainloop()

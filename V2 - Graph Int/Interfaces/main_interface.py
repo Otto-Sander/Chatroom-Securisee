@@ -44,8 +44,8 @@ head4 = ("Lexend", 11)
 head4_button = ("Lexend", 9)
 
 #Classe principale de login
-class LoginWindow:
-    #Introduction
+class MainInterface:
+    #Introduction PANEL --------------------------------------------------------------------------------------------
     def __init__(self, master):
         self.master = master
         self.master.title("Authentification")
@@ -84,12 +84,12 @@ class LoginWindow:
         # Convertir l'image redimensionnée en format ImageTk.PhotoImage
         image = ImageTk.PhotoImage(resized_image)
         # Créer le bouton avec l'image redimensionnée
-        self.roundedbutton = tk.Button(self.frame, image=image, bd=0, borderwidth=0,bg=cadre,command=self.show_authentication)
+        self.roundedbutton = tk.Button(self.frame, image=image, bd=0, borderwidth=0,bg=cadre,command=self.show_home)
         self.roundedbutton.image = image  # Gardez une référence à l'image pour éviter la collecte des déchets
         self.roundedbutton.place(x=720, y=450)
         #-----------------------------------------------------
 
-    #Connection panel : login ------------------------------------------------------
+    #Connection panel : LOGIN PANEL --------------------------------------------------------------------------------------
     def show_authentication(self):
         self.frame.destroy()
 
@@ -204,7 +204,7 @@ class LoginWindow:
         button = CTkButton(master=self.frame,text='Create Account',corner_radius=32,fg_color='#318A4C',hover_color='#C850C0',width=200,font=head3,command=self.show_create_user)
         button.place(x=500,y=520)
 
-    #Connection panel : create user
+    #Connection panel : CREATE USER PANEL -------------------------------------------------------------------------------------------------------
     def show_create_user(self):
         self.frame.destroy()  # Supprimer le cadre actuel
 
@@ -329,13 +329,71 @@ class LoginWindow:
         self.roundedbutton.place(relx=0.065, y=450)
         #-----------------------------------------------------
 
-    #Connection panel : back to login
+    #Connection panel : -------------------------------------------------------------------------------------------------------
+    def show_config(self):
+        self.frame.destroy()
+
+        # Cadre principal ---------------------------------------
+        self.frame = CTkFrame(self.master,width=950,height=600,corner_radius=30,fg_color=cadre,bg_color='#1A324C')
+        self.frame.place(x=200,y=70)
+
+        self.title_label = tk.Label(self.frame, text="Join a room to chat with your friends !", font=head1, bg=cadre, fg=letter)
+        self.title_label.place(relx=0.5, rely=0.12, anchor=tk.CENTER)
+
+        image_path = "Images\\phone.png"
+        image = Image.open(image_path)
+        image = image.resize((230,230))
+        image = ImageTk.PhotoImage(image)
+        label = Label(self.frame, image=image, borderwidth=0, bg=cadre)
+        label.image = image  # Référence nécessaire pour empêcher la collecte des déchets
+        label.place(relx=0.27, rely=0.5, anchor=tk.CENTER)
+
+        self.enter_code_label = tk.Label(self.frame, text="Enter room code", font=head2, bg=cadre, fg=letter)
+        self.enter_code_label.place(relx=0.67, rely=0.27, anchor=tk.CENTER)
+        code_entry = CTkEntry(master=self.frame, corner_radius=20, fg_color='#ffffff', text_color="black", width=200, height=55, font=('Lexend', 30))
+        code_entry.place(relx=0.67, rely=0.35, anchor=tk.CENTER)
+        button_join = CTkButton(master=self.frame, text='Join', corner_radius=32, fg_color=button, hover_color=hover_button,text_color=letter_button, width=200, font=('Lexend', 30, 'bold'))
+        button_join.place(relx=0.67, rely=0.45, anchor=tk.CENTER)
+
+        self.or_label = tk.Label(self.frame, text="or", font=('Lexend', 20), bg=cadre, fg=letter)
+        self.or_label.place(relx=0.67, rely=0.55, anchor=tk.CENTER)
+
+        self.button_generate = CTkButton(master=self.frame, text='Generate a code', corner_radius=32,fg_color=button, hover_color=hover_button, width=200, text_color=letter_button,font=('Lexend', 30, 'bold'), command=self.generate_code)
+        self.button_generate.place(relx=0.67, rely=0.65, anchor=tk.CENTER)
+        self.code_label = tk.Label(self.frame, text="", font=('Lexend', 30), bg=cadre, fg='white')
+
+        self.label = tk.Label(self.frame, text="To connect with your friends, enter their code or generate a new one", font=('Lexend', 15), bg=cadre, fg=letter)
+        self.label.place(relx=0.5, rely=0.90, anchor=tk.CENTER)
+
+    #Home Panel ---------------------------------------------------------------------------------------------------------------
+    def show_home(self):
+
+        # Supprime l'ancienne fenêtre
+        self.frame.destroy()
+
+        # Cadre principal ---------------------------------------
+        self.frame = CTkFrame(self.master,width=950,height=600,corner_radius=30,fg_color=cadre,bg_color='#1A324C')
+        self.frame.place(x=200,y=70)
+
+        # Titre 
+        self.title_label = tk.Label(self.frame, text="SafeTalk", font=head1, bg=cadre, fg=letter)
+        self.title_label.place(relx=0.138, rely=0.12, anchor=tk.CENTER)
+
+        # Créer la ligne sous le logo
+        self.username_line = Canvas(self.frame, width=300, height=2.0, bg='#bdb9b1', highlightthickness=0)
+        self.username_line.place(x=500, y=339)
+
+
+
+    # -----------------------------------------------------------------------------------------------------------
+    # -------------------------------------- ACTION FUNCTIONS ---------------------------------------------------
+    # -----------------------------------------------------------------------------------------------------------
+
     def back_to_login(self):
         # Efface le contenu du cadre
         self.frame.destroy()
         # Affiche à nouveau le formulaire d'authentification
         self.show_authentication()
-
 
     #ALERT : Create User failed
     def create_user(self):
@@ -359,46 +417,9 @@ class LoginWindow:
         password = self.passwd_entry.get()
         if username == "admin" and password == "admin":
             self.frame.destroy()  # Fermer l'ancienne interface
-            self.show_config()
+            self.show_home()
         else:
             tk.messagebox.showerror("Erreur", "Nom d'utilisateur ou mot de passe incorrect.")
-
-    #SHOW : Confiration Connection
-    def show_config(self):
-        self.frame.destroy()
-
-        # Cadre principal ---------------------------------------
-        self.frame = CTkFrame(self.master,width=950,height=600,corner_radius=30,fg_color=cadre,bg_color='#1A324C')
-        self.frame.place(x=200,y=70)
-
-        self.title_label = tk.Label(self.frame, text="Join a room to chat with your friends !", font=head1, bg=cadre, fg=letter)
-        self.title_label.place(relx=0.5, rely=0.12, anchor=tk.CENTER)
-
-        image_path = "Images\\phone.png"
-        image = Image.open(image_path)
-        image = image.resize((230,230))
-        image = ImageTk.PhotoImage(image)
-        label = Label(self.frame, image=image, borderwidth=0, bg=cadre)
-        label.image = image  # Référence nécessaire pour empêcher la collecte des déchets
-        label.place(relx=0.27, rely=0.5, anchor=tk.CENTER)
-
-        self.enter_code_label = tk.Label(self.frame, text="Enter room code", font=head2, bg=cadre, fg=letter)
-        self.enter_code_label.place(relx=0.67, rely=0.27, anchor=tk.CENTER)
-        code_entry = CTkEntry(master=self.frame, corner_radius=20, fg_color='#ffffff', text_color="black", width=200, height=55, font=('Lexend', 30))
-        code_entry.place(relx=0.67, rely=0.35, anchor=tk.CENTER)
-        button_join = CTkButton(master=self.frame, text='Join', corner_radius=32, fg_color=button, hover_color=hover_button,text_color=letter_button, width=200, font=('Lexend', 30, 'bold'),command=self.connect_Client())
-        button_join.place(relx=0.67, rely=0.45, anchor=tk.CENTER)
-
-        self.or_label = tk.Label(self.frame, text="or", font=('Lexend', 20), bg=cadre, fg=letter)
-        self.or_label.place(relx=0.67, rely=0.55, anchor=tk.CENTER)
-
-        self.button_generate = CTkButton(master=self.frame, text='Generate a code', corner_radius=32,fg_color=button, hover_color=hover_button, width=200, text_color=letter_button,font=('Lexend', 30, 'bold'), command=self.generate_code)
-        self.button_generate.place(relx=0.67, rely=0.65, anchor=tk.CENTER)
-        self.code_label = tk.Label(self.frame, text="", font=('Lexend', 30), bg=cadre, fg='white')
-
-        self.label = tk.Label(self.frame, text="To connect with your friends, enter their code or generate a new one", font=('Lexend', 15), bg=cadre, fg=letter)
-        self.label.place(relx=0.5, rely=0.90, anchor=tk.CENTER)
-
 
     def generate_code(self):
         # Générer un code aléatoire de 8 caractères
@@ -411,21 +432,23 @@ class LoginWindow:
         self.button_generate.destroy()
 
         # Créer un nouveau bouton avec le texte et la commande mis à jour
-        self.button_enter_room = CTkButton(master=self.frame, text='Enter room', corner_radius=32, fg_color="#FE9900", text_color=letter_button,hover_color="#C27602", width=200, font=('Lexend', 30, 'bold'),command=self.connect_chatroom_hostClient)
+        self.button_enter_room = CTkButton(master=self.frame, text='Enter room', corner_radius=32, fg_color="#FE9900", text_color=letter_button,hover_color="#C27602", width=200, font=('Lexend', 30, 'bold'),command=self.connect_chatroom)
         self.button_enter_room.place(relx=0.67, rely=0.75, anchor=tk.CENTER)
 
-        copy_image_path = "Images\\copy.png"
+        copy_image_path = "..\\Images\\copy.png"
         copy_image = Image.open(copy_image_path).convert("RGBA")
         copy_image = copy_image.resize((20, 20))
         copy_image = ImageTk.PhotoImage(copy_image)
 
-        self.button_copy_code = CTkButton(master=self.frame, image=copy_image, text='', corner_radius=5, fg_color="#040D15",hover_color=hover_button, width=20, font=('Lexend', 15, 'bold'),command=lambda: self.copy_to_clipboard(code))
+        self.button_copy_code = CTkButton(master=self.frame, image=copy_image, text='', corner_radius=5, fg_color="#040D15",hover_color=hover_button, width=20, font=('Lexend', 15, 'bold'),command=self.copy_to_clipboard(code))
         self.button_copy_code.place(relx=0.81, rely=0.65, anchor=tk.CENTER)
 
     def copy_to_clipboard(self, code):
         self.master.clipboard_clear()
         self.master.clipboard_append(code)
         self.master.update()
+
+# ------------------------------------------------- Connection ------------------------------------------
 
     #ALERT : Connection Success
     def connect_Client(option):
