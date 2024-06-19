@@ -34,16 +34,15 @@ from DB_Additional_Functions import *
 from DB_CRUD_Functions import *
 
 
-# ------------------------ COLOR DESIGN ------------------------------------------------------
+# ------------------------ COLOR DESIGN ----------------------------------
 cadre = '#0A1A29'
 back = '#1A1E88'
 letter = 'white'
 letter_button = 'white'
 button = '#1821BD'
 hover_button="#C9511D"
-# ----------------------------------------------------------------------------------------------
 
-# Définition des polices
+# -------------------- Définition des polices ----------------------------
 head1 = ("Lexend", 25, "bold") 
 head2 = ("Lexend", 19)
 head3 = ("Lexend", 15)
@@ -52,8 +51,18 @@ head4_button = ("Lexend", 9)
 
 #Classe principale de login
 class MainInterface:
+
     #Introduction PANEL --------------------------------------------------------------------------------------------
     def __init__(self, master):
+
+# ------------------- Brouillon à supprimer une fois qu'on aura l'accès au user actuel ----
+        self.user_data = {
+            "username": "Otto",
+            "email":"ottosander@efrei.net",
+            "passwd": "admin"
+        }
+# -----------------------------------------------------------------------------------------
+
         self.supabase = supabase
         self.master = master
         self.master.title("Authentification")
@@ -323,7 +332,7 @@ class MainInterface:
         self.passwd_icon_label.image = photo_passwd
         self.passwd_icon_label.place(x=500, y=413)
 
-        # Login Button ------------------------------------
+        # Create Button ------------------------------------
         button = CTkButton(master=self.frame,text='Create',corner_radius=32,fg_color='#4158D0',hover_color='#C850C0',width=300,font=head3,command=self.create_user)
         button.place(x=500,y=475)
 
@@ -337,6 +346,85 @@ class MainInterface:
         self.roundedbutton.image = image  # Gardez une référence à l'image pour éviter la collecte des déchets
         self.roundedbutton.place(relx=0.065, y=450)
         #-----------------------------------------------------
+
+    # USER SETTINGS PANEL --------------------------------------------------------------------------------------------
+    def show_user_settings(self):
+
+        self.frame.destroy()
+
+         # Cadre principal ------------------------------------------------
+        self.frame = CTkFrame(self.master,width=950,height=600,corner_radius=30,fg_color=cadre,bg_color='#1A324C')
+        self.frame.place(x=200,y=70)
+
+       # Title ---------------------------------------------------------
+        head = "User Settings"
+        self.heading_1 = Label(self.frame, text=head, font=head1, bg=cadre, fg=letter, justify=LEFT,anchor="nw")
+        self.heading_1.place(relx=0.065, rely=0.08, width=1000, height=100)
+
+
+        #Introduction : 1 -----------------------------------------
+        txt = "Here are your details. Update them as needed."
+        self.heading_1 = Label(self.frame, text=txt, font=head2, bg=cadre, fg=letter, justify=LEFT,anchor="nw")
+        self.heading_1.place(relx=0.065, y=90, width=1000, height=100)
+
+        # Image Utilisateur -----------------------------------------
+        image_path = "Images/user.png"
+        image = Image.open(image_path)
+        image = image.resize((60, 60))
+        user_image = ImageTk.PhotoImage(image)
+        user_label = tk.Label(self.frame, image=user_image, bg=cadre)
+        user_label.image = user_image
+        user_label.place(x=440, y=160)
+
+        # Entrées pour le nom d'utilisateur -------------------------------------
+        username_label = tk.Label(self.frame, text='Username:', bg=cadre, font=('Arial', 14, 'bold'), fg='white')
+        username_label.place(x=290, y=250)
+
+        self.username_entry_var = tk.StringVar(value=self.user_data["username"])
+        self.username_entry = Entry(self.frame, textvariable=self.username_entry_var, font=('Arial', 14),width=24)
+        self.username_entry.place(x=410, y=250)
+
+        # Entrées pour l'email -------------------------------------
+        email_label = tk.Label(self.frame, text='Email Address:', bg=cadre, font=('Arial', 14, 'bold'), fg='white')
+        email_label.place(x=290, y=290)
+
+        self.email_entry_var = tk.StringVar(value=self.user_data["email"])
+        self.email_entry = Entry(self.frame, textvariable=self.email_entry_var, font=('Arial', 14))
+        self.email_entry.place(x=450, y=290)
+
+        # Entrées pour le mot de passe -------------------------------------
+        passwd_label = tk.Label(self.frame, text='Password:', bg=cadre, font=('Arial', 14, 'bold'), fg='white')
+        passwd_label.place(x=290, y=330)
+
+        self.passwd_entry_var = tk.StringVar(value=self.user_data["passwd"])
+        self.passwd_entry = Entry(self.frame, textvariable=self.passwd_entry_var, font=('Arial', 14), show="*",width=24)
+        self.passwd_entry.place(x=410, y=330)
+
+        # Entrées pour le mot de passe confirmé -------------------------------------
+        confirm_passwd_label = tk.Label(self.frame, text='Confirm Password:', bg=cadre, font=('Arial', 14, 'bold'), fg='white')
+        confirm_passwd_label.place(x=290, y=370)
+
+        self.confirm_passwd_var = tk.StringVar(value=self.user_data["passwd"])
+        self.confirm_passwd_entry = Entry(self.frame, textvariable=self.confirm_passwd_var, font=('Arial', 14), show="*",width=17)
+        self.confirm_passwd_entry.place(x=485, y=370)
+
+        # Boutton pour enregistrer les modifs -------------------------------
+        self.save_button = CTkButton(master=self.frame,text='Save Changes',corner_radius=32,fg_color='#318A4C',hover_color='#C850C0',width=300,height=50,font=head3,command=self.change_user_settings, state=DISABLED)
+        self.save_button.place(x=325,y=435)
+
+        # Attacher les traceurs aux variables
+        self.username_entry_var.trace_add("write", self.on_change)
+        self.passwd_entry_var.trace_add("write", self.on_change)
+        self.email_entry_var.trace_add("write",self.on_change)
+        self.confirm_passwd_var.trace_add("write",self.on_change)
+
+        # Bouton pour retourner à l'authentification -----------------------------------
+        back_button_image = Image.open("Images/logo_next_before.png")
+        resized_image = back_button_image.resize((60, 60))
+        back_button_photo = ImageTk.PhotoImage(resized_image)
+        back_button = tk.Button(self.frame, image=back_button_photo, borderwidth=0, bg=cadre ,command=self.show_config)
+        back_button.image = back_button_photo
+        back_button.place(relx=0.065, rely=0.79)
 
     #Connection panel : -------------------------------------------------------------------------------------------------------
     def show_config(self):
@@ -365,7 +453,7 @@ class MainInterface:
         # Convertir l'image redimensionnée en format ImageTk.PhotoImage
         image = ImageTk.PhotoImage(resized_image)
         # Créer le bouton avec l'image redimensionnée
-        self.roundedbutton_user_settings = tk.Button(self.frame, image=image, bd=0, borderwidth=0,bg=cadre,command=self.show_config)
+        self.roundedbutton_user_settings = tk.Button(self.frame, image=image, bd=0, borderwidth=0,bg=cadre,command=self.show_user_settings)
         self.roundedbutton_user_settings.image = image  # Gardez une référence à l'image pour éviter la collecte des déchets
         self.roundedbutton_user_settings.place(relx=0.85, rely=0.09)
         #-----------------------------------------------------
@@ -421,11 +509,24 @@ class MainInterface:
     # -------------------------------------- ACTION FUNCTIONS ---------------------------------------------------
     # -----------------------------------------------------------------------------------------------------------
 
+    def save_user_modifications(self):
+        self.user_data["username"] = self.username_var.get()
+        self.user_data["passwd"] = self.email_var.get()
+        tk.messagebox.showinfo("Info", "Données sauvegardées avec succès!")
+        self.save_button.config(state=tk.DISABLED)
+
+    def on_change(self, *args):
+        self.save_button.configure(state=tk.NORMAL)
+
     def back_to_login(self):
         # Efface le contenu du cadre
         self.frame.destroy()
         # Affiche à nouveau le formulaire d'authentification
         self.show_authentication()
+
+    def back_to_config(self):
+        self.frame.destroy()
+        self.show_config()
 
     #ALERT : Create User failed
     def create_user(self):
@@ -436,7 +537,7 @@ class MainInterface:
 
         if new_password != confirm_password:
             tk.messagebox.showerror("Erreur", "Les mots de passe ne correspondent pas.")
-        elif new_username == "" or new_password == "":
+        elif new_username == "" or new_password == "" or confirm_password == "":
             tk.messagebox.showerror("Erreur", "Veuillez remplir tous les champs.")
         else:
             # Enregistrer le nouvel utilisateur (code à implémenter)
@@ -455,9 +556,36 @@ class MainInterface:
             hashed_password_str = hashed_password.decode('utf-8')
 
             # Enregistrer le nouvel utilisateur
-            add_user(supabase, new_username, hashed_password_str, None)
+            add_user(supabase, new_username, hashed_password_str, "mymail2")
             tk.messagebox.showinfo("Succès", "Compte créé avec succès !")
             self.back_to_login() # Retour à la page de connexion après la création de compte
+
+    def change_user_settings(self):
+        new_username = self.username_entry.get()
+        new_email = self.email_entry.get()
+        new_password = self.passwd_entry.get()
+        confirm_password = self.confirm_passwd_entry.get()
+
+        #Hacher le mot de passe :
+        hashed_password = self.password_hash(new_password)
+        hashed_password_str = hashed_password.decode('utf-8')
+
+        # Rule : Not existing user
+        existing_users = get_user_all(supabase, new_username)
+        if existing_users:
+            tk.messagebox.showerror("Erreur", "Le nom d'utilisateur existe déjà.")
+            return
+        elif new_password != confirm_password:
+            tk.messagebox.showerror("Erreur", "Les mots de passe ne correspondent pas.")
+        elif new_username == "" or new_password == "" or confirm_password == "" or new_email == "":
+            tk.messagebox.showerror("Erreur", "Veuillez remplir tous les champs.")
+        else:                          
+            update_username(supabase,self.user_data["username"],new_username=new_username)
+            update_mail(supabase,new_username,new_mail=new_email)
+            update_password(supabase,new_username,hashed_password_str)
+            
+            tk.messagebox.showinfo("Succès", "Your account has been successfully modified !")
+            self.back_to_config()
 
     def password_hash(self, password):
         return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
@@ -479,6 +607,7 @@ class MainInterface:
             if self.check_password(password, hash_password.encode('utf-8')):
                 self.frame.destroy()  # Fermer l'ancienne interface
                 self.show_config()
+
             else:
                 tk.messagebox.showerror("Erreur", "Nom d'utilisateur ou mot de passe incorrect.")
         else:
