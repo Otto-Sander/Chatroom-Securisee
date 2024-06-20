@@ -479,9 +479,9 @@ class MainInterface:
 
         self.enter_code_label = tk.Label(self.frame, text="Enter room code", font=head2, bg=cadre, fg=letter)
         self.enter_code_label.place(relx=0.67, rely=0.37, anchor=tk.CENTER)
-        code_entry = CTkEntry(master=self.frame, corner_radius=20, fg_color='#ffffff', text_color="black", width=200, height=55, font=('Lexend', 30))
-        code_entry.place(relx=0.67, rely=0.45, anchor=tk.CENTER)
-        button_join = CTkButton(master=self.frame, text='Join', corner_radius=32, fg_color=button, hover_color=hover_button,text_color=letter_button, width=200, font=('Lexend', 30, 'bold'))
+        self.code_entry = CTkEntry(master=self.frame, corner_radius=20, fg_color='#ffffff', text_color="black", width=200, height=55, font=('Lexend', 30))
+        self.code_entry.place(relx=0.67, rely=0.45, anchor=tk.CENTER)
+        button_join = CTkButton(master=self.frame, text='Join', corner_radius=32, fg_color=button, hover_color=hover_button,text_color=letter_button, width=200, font=('Lexend', 30, 'bold'), command=self.connect_chatroom)
         button_join.place(relx=0.67, rely=0.55, anchor=tk.CENTER)
 
         self.or_label = tk.Label(self.frame, text="or", font=('Lexend', 20), bg=cadre, fg=letter)
