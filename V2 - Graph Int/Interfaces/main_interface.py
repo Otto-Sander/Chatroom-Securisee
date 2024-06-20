@@ -127,7 +127,7 @@ class MainInterface:
         self.heading_1.place(relx=0.065, y=90, width=1000, height=100)
 
         # GIF Animation Star ------------------------------------------
-        gif_path = 'videos/star_effect.gif'
+        gif_path = 'Videos/star_effect.gif'
 
         def get_frames(gif_path):
             frames = []
@@ -167,7 +167,7 @@ class MainInterface:
         label.place(x=110, y=250)
 
         # User Image Panel ----------------------------------------------------
-        image = Image.open("Images\\user.png")
+        image = Image.open(os.path.join("Images","user.png"))
         image = image.resize((60,60))
         image = ImageTk.PhotoImage(image)
         label = Label(self.frame, image=image,borderwidth=0,bg=cadre)
@@ -187,7 +187,7 @@ class MainInterface:
         self.username_line.place(x=500, y=339)
 
         # User laber logo ----------------------------------------------
-        username_icon = Image.open('images/user_label.png')
+        username_icon = Image.open('Images/user_label.png')
         resized_icon = username_icon.resize((20, 20))
         photo_user = ImageTk.PhotoImage(resized_icon)
         self.username_icon_label = Label(self.frame, image=photo_user, bg=cadre)
@@ -203,7 +203,7 @@ class MainInterface:
         self.passwd_line.place(x=500, y=410)
 
         # Password laber logo ----------------------------------------------
-        passwd_icon = Image.open('images/lock.png')
+        passwd_icon = Image.open('Images/lock.png')
         resized_icon = passwd_icon.resize((20, 20))
         photo_passwd = ImageTk.PhotoImage(resized_icon)
         self.passwd_icon_label = Label(self.frame, image=photo_passwd, bg=cadre)
@@ -242,7 +242,7 @@ class MainInterface:
         self.heading_1.place(relx=0.065, y=90, width=1000, height=100)
 
         # GIF Animation Star ------------------------------------------
-        gif_path = 'videos/create_account.gif'
+        gif_path = 'Videos/create_account.gif'
 
         def get_frames(gif_path):
             frames = []
@@ -273,7 +273,7 @@ class MainInterface:
         self.frame.after(0, update, 0)
 
         # User Image Panel ----------------------------------------------------
-        image = Image.open("Images\\user.png")
+        image = Image.open(os.path.join("Images","user.png"))
         image = image.resize((60,60))
         image = ImageTk.PhotoImage(image)
         label = Label(self.frame, image=image,borderwidth=0,bg=cadre)
@@ -293,7 +293,7 @@ class MainInterface:
         self.username_line.place(x=500, y=309)
 
         # User laber logo ----------------------------------------------
-        username_icon = Image.open('images/user_label.png')
+        username_icon = Image.open('Images/user_label.png')
         resized_icon = username_icon.resize((20, 20))
         photo_user = ImageTk.PhotoImage(resized_icon)
         self.username_icon_label = Label(self.frame, image=photo_user, bg=cadre)
@@ -309,7 +309,7 @@ class MainInterface:
         self.passwd_line.place(x=500, y=380)
 
         # Password laber logo ----------------------------------------------
-        passwd_icon = Image.open('images/lock.png')
+        passwd_icon = Image.open('Images","lock.png')
         resized_icon = passwd_icon.resize((20, 20))
         photo_passwd = ImageTk.PhotoImage(resized_icon)
         self.passwd_icon_label = Label(self.frame, image=photo_passwd, bg=cadre)
@@ -325,7 +325,7 @@ class MainInterface:
         self.passwd_line.place(x=500, y=450)
 
         # Confirm Password laber logo ----------------------------------------------
-        passwd_icon = Image.open('images/lock.png')
+        passwd_icon = Image.open(os.path.join("images","lock.png"))
         resized_icon = passwd_icon.resize((20, 20))
         photo_passwd = ImageTk.PhotoImage(resized_icon)
         self.passwd_icon_label = Label(self.frame, image=photo_passwd, bg=cadre)
@@ -368,7 +368,7 @@ class MainInterface:
         self.heading_1.place(relx=0.065, y=90, width=1000, height=100)
 
         # Image Utilisateur -----------------------------------------
-        image_path = "Images/user.png"
+        image_path = os.path.join("Images","user.png")
         image = Image.open(image_path)
         image = image.resize((60, 60))
         user_image = ImageTk.PhotoImage(image)
@@ -419,7 +419,7 @@ class MainInterface:
         self.confirm_passwd_var.trace_add("write",self.on_change)
 
         # Bouton pour retourner à l'authentification -----------------------------------
-        back_button_image = Image.open("Images/logo_next_before.png")
+        back_button_image = Image.open(os.path.join("Images","logo_next_before.png"))
         resized_image = back_button_image.resize((60, 60))
         back_button_photo = ImageTk.PhotoImage(resized_image)
         back_button = tk.Button(self.frame, image=back_button_photo, borderwidth=0, bg=cadre ,command=self.show_config)
@@ -448,7 +448,7 @@ class MainInterface:
         label.place(relx=0.07, rely=0.09)
 
         # USER SETTINGS BUTTON -------------------------------
-        button_user_settings = Image.open("Images/user_settings.png")
+        button_user_settings = Image.open(os.path.join("Images","user_settings.png"))
         resized_image = button_user_settings.resize((50, 50))
         # Convertir l'image redimensionnée en format ImageTk.PhotoImage
         image = ImageTk.PhotoImage(resized_image)
@@ -469,7 +469,7 @@ class MainInterface:
         # CONTENT -----------------------------------------------------------
 
         # Image
-        image_path = "Images\\phone.png"
+        image_path = os.path.join("Images","phone.png")
         image = Image.open(image_path)
         image = image.resize((230,230))
         image = ImageTk.PhotoImage(image)
@@ -492,7 +492,7 @@ class MainInterface:
         self.code_label = tk.Label(self.frame, text="", font=('Lexend', 30), bg=cadre, fg='white')
 
         # LOGOUT BUTTON -------------------------------
-        button_logout = Image.open("Images/logout_bl.png")
+        button_logout = Image.open(os.path.join("Images","logout_bl.png"))
         resized_image = button_logout.resize((53, 53))
         # Convertir l'image redimensionnée en format ImageTk.PhotoImage
         image = ImageTk.PhotoImage(resized_image)
@@ -627,7 +627,7 @@ class MainInterface:
         self.button_enter_room = CTkButton(master=self.frame, text='Enter room', corner_radius=32, fg_color="#FE9900", text_color=letter_button,hover_color="#C27602", width=200, font=('Lexend', 30, 'bold'),command=lambda: self.connect_chatroom_hosting())
         self.button_enter_room.place(relx=0.67, rely=0.75, anchor=tk.CENTER)
 
-        copy_image_path = "Images/copy.png"
+        copy_image_path = os.path.join("Images","copy.png")
         copy_image = Image.open(copy_image_path).convert("RGBA")
         copy_image = copy_image.resize((20, 20))
         copy_image = ImageTk.PhotoImage(copy_image)
