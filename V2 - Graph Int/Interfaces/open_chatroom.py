@@ -4,8 +4,10 @@ from tkinter import messagebox
 import datetime
 import socket
 import threading
+from DB_main import supabase
+from DB_CRUD_Functions import *
 
-def open_chatroom(ip, port):
+def open_chatroom(code):
     ctk.set_appearance_mode("dark")
     ctk.set_default_color_theme("blue")
 
@@ -42,9 +44,16 @@ def open_chatroom(ip, port):
     message_entry.pack(side=tk.LEFT, padx=10, pady=5, fill=tk.X, expand=True)
 
     try:
+        print("Trying to connect to server...")
+        ip, port = get_last_server(supabase)
+        print(f"Server IP: {ip}, Port: {port}")
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        print("Socket created")
         client.connect((ip, port))
         print(f"Connected to server at {ip}:{port}")
+
+        client.send(code.encode('ascii'))
+        print(f"Joined channel {code}")
     except Exception as e:
         messagebox.showerror("Erreur", f"Impossible de se connecter au serveur : {e}")
         return

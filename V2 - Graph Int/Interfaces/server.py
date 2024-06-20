@@ -61,7 +61,7 @@ def start_server():
 
             # Uncomment the following lines for channel functionality
             # client_socket.send(b"Enter channel:")
-            # channel = client_socket.recv(1024).decode('ascii')
+            channel = client_socket.recv(1024).decode('ascii')
 
             with lock:
                 connections.append(client_socket)
