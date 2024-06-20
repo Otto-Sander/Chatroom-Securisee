@@ -53,7 +53,7 @@ def open_chatroom(code):
         client.connect((ip, port))
         print(f"Connected to server at {ip}:{port}")
 
-        client.send(code.encode('ascii'))
+        client.send(code.encode('utf-8'))
         print(f"Joined channel {code}")
     except Exception as e:
         messagebox.showerror("Erreur", f"Impossible de se connecter au serveur : {e}")
@@ -67,7 +67,7 @@ def open_chatroom(code):
         message = message_entry.get()
         if message:
             try:
-                client.send(message.encode('ascii'))
+                client.send(message.encode('utf-8'))
                 display_message(chat_box, "Moi", message)
                 message_entry.delete(0, tk.END)
             except Exception as e:
@@ -97,8 +97,8 @@ def open_chatroom(code):
     def receive_messages():
         while True:
             try:
-                message = client.recv(1024).decode('ascii')
-                if message:
+                message = client.recv(1024).decode('utf-8')
+                if message and message != "Channel joined successfully.":  # Ignore the initial join message
                     display_message(chat_box, "Autre", message)
             except Exception as e:
                 print("Erreur de réception des messages:", e)
