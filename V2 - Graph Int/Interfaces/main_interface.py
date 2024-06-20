@@ -614,8 +614,9 @@ class MainInterface:
             tk.messagebox.showerror("Erreur", "Nom d'utilisateur ou mot de passe incorrect.")
 
     def generate_code(self):
-        # Générer un code aléatoire de 8 caractères
+        # Générer un code aléatoire de 7 caractères
         code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=7))
+        add_code(supabase, code)
         self.code_label.config(text=code)
         self.code_label.place(relx=0.67, rely=0.65, anchor=tk.CENTER)
 
@@ -623,7 +624,7 @@ class MainInterface:
         self.button_generate.destroy()
 
         # Créer un nouveau bouton avec le texte et la commande mis à jour
-        self.button_enter_room = CTkButton(master=self.frame, text='Enter room', corner_radius=32, fg_color="#FE9900", text_color=letter_button,hover_color="#C27602", width=200, font=('Lexend', 30, 'bold'),command=lambda: self.connect_Client)
+        self.button_enter_room = CTkButton(master=self.frame, text='Enter room', corner_radius=32, fg_color="#FE9900", text_color=letter_button,hover_color="#C27602", width=200, font=('Lexend', 30, 'bold'),command=lambda: self.connect_chatroom_hosting())
         self.button_enter_room.place(relx=0.67, rely=0.75, anchor=tk.CENTER)
 
         copy_image_path = "Images/copy.png"
@@ -631,8 +632,6 @@ class MainInterface:
         copy_image = copy_image.resize((20, 20))
         copy_image = ImageTk.PhotoImage(copy_image)
 
-        #Changer la méthode pour récupérer les IP et port
-        #add_session(supabase, code, None, None, "IP_privee_here", 12345)
 
         self.button_copy_code = CTkButton(master=self.frame, image=copy_image, text='', corner_radius=5, fg_color="#040D15",hover_color=hover_button, width=20, font=('Lexend', 15, 'bold'),command=self.copy_to_clipboard(code))
         self.button_copy_code.place(relx=0.81, rely=0.65, anchor=tk.CENTER)
@@ -644,23 +643,30 @@ class MainInterface:
 
 # ------------------------------------------------- Connection ------------------------------------------
 
-    #ALERT : Connection Success
+    # ALERT : Connection Success
     def connect_chatroom(self):
         code = self.code_entry.get()
         if code:
             try:
-                # Récupérer les informations de session à partir du code
-                ip_public = get_IP_public(supabase, code)
-                port_server = get_Port_Server(supabase, code)
-                ip_privee = get_IP_privee(supabase, code)
-                port_privee = get_Port_privee(supabase, code)
-
                 # Connecter à la chatroom en utilisant les informations récupérées
-                open_chatroom(ip_privee, port_privee)
+                open_chatroom(code)
+
+                print("Info", "Connecté à la chatroom avec succès.")
+            except IndexError:
+                tk.messagebox.showerror("Erreur", "Code de session invalide.")
+        else:
+            tk.messagebox.showerror("Erreur", "Veuillez entrer un code de session.")
+
+    def connect_chatroom_hosting(self):
+        code = self.code_label.cget("text")
+
+        if code:
+            try:
+                # Connecter à la chatroom en utilisant les informations récupérées
+                open_chatroom(code)
 
                 tk.messagebox.showinfo("Info", "Connecté à la chatroom avec succès.")
             except IndexError:
                 tk.messagebox.showerror("Erreur", "Code de session invalide.")
         else:
             tk.messagebox.showerror("Erreur", "Veuillez entrer un code de session.")
-

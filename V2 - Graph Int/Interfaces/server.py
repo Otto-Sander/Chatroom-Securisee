@@ -1,5 +1,10 @@
 import socket
 import threading
+from DB_CRUD_Functions import *
+from DB_main import supabase
+
+lock = threading.Lock()
+server_socket = None
 
 def get_private_ip():
     try:
@@ -11,6 +16,16 @@ def get_private_ip():
     except Exception as e:
         print(f"Erreur lors de la récupération de l'adresse IP : {e}")
         return None
+
+def get_server_port():
+    global server_socket
+    if server_socket:
+        try:
+            ip, server_port = server_socket.getsockname()
+            return server_port
+        except socket.error as e:
+            print(f"Erreur lors de la récupération du port du serveur : {e}")
+            return None
 
 def find_free_port():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -40,6 +55,24 @@ def client_handler(client_socket, client_address, connections, lock):
             connections.remove(client_socket)
         client_socket.close()
 
+def join_channel(client_socket, channel_code):
+    try:
+        session = get_all_codes(supabase)
+        if session:
+            ip, port = get_last_server(supabase)
+            client_socket.send(b"Channel joined successfully.")
+            client_socket.send(f"IP privée du serveur: {ip}, port {port}.".encode('ascii'))
+
+            threading.Thread(target=client_handler,
+                             args=(client_socket, client_socket.getpeername(), channel_code)).start()
+        else:
+            client_socket.send(b"Channel does not exist in the database.")
+            print(f"Channel {channel_code} does not exist in the database.")
+            client_socket.close()
+    except Exception as e:
+        print("Error joining channel:", e)
+        client_socket.close()
+
 def start_server():
     ip = get_private_ip()
     port = find_free_port()
@@ -47,6 +80,7 @@ def start_server():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     server_socket.bind((ip, port))
+    add_server(supabase, ip, port)
 
     server_socket.listen(5)
     print("Server listening on", server_socket.getsockname(), "...")
@@ -60,8 +94,8 @@ def start_server():
             print(f"Accepted a new connection from {client_address}")
 
             # Uncomment the following lines for channel functionality
-            # client_socket.send(b"Enter channel:")
-            # channel = client_socket.recv(1024).decode('ascii')
+            client_socket.send(b"Enter channel:")
+            channel = client_socket.recv(1024).decode('ascii')
 
             with lock:
                 connections.append(client_socket)
@@ -70,6 +104,7 @@ def start_server():
     except Exception as e:
         print("Server error:", e)
     finally:
+        delete_server(supabase, ip)
         server_socket.close()
 
 if __name__ == "__main__":
