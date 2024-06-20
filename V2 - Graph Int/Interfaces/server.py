@@ -20,24 +20,24 @@ def find_free_port():
     s.close()
     return port
 
-def client_handler(client_socket, client_address, connections, lock):
+def client_handler(client_socket, client_address,channel, connections, lock):
     try:
         # Handle client messages within a specific channel
         while True:
             message = client_socket.recv(1024)
             if message:
-                print(f"Message from {client_address}: {message}")
+                print(f"Message from {client_address} in channel {channel}: {message}")
                 with lock:
                     for connection in connections:
-                        if connection != client_socket:
-                            connection.send(message)
+                        if connection != client_socket and connection[1] == channel:
+                            connection[0].send(message)
             else:
                 break
     except Exception as e:
         print("Client handler error:", e)
     finally:
         with lock:
-            connections.remove(client_socket)
+            connections.remove((client_socket,channel))
         client_socket.close()
 
 def start_server():
@@ -64,9 +64,9 @@ def start_server():
             channel = client_socket.recv(1024).decode('ascii')
 
             with lock:
-                connections.append(client_socket)
+                connections.append((client_socket,channel))
 
-            threading.Thread(target=client_handler, args=(client_socket, client_address, connections, lock)).start()
+            threading.Thread(target=client_handler, args=(client_socket, client_address,channel, connections, lock)).start()
     except Exception as e:
         print("Server error:", e)
     finally:
