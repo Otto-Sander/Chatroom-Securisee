@@ -1,19 +1,14 @@
 import customtkinter as ctk
 import tkinter as tk
-from tkinter import messagebox, filedialog
+from tkinter import *
 import datetime
 import socket
 import threading
-import tkinter as tk
-from tkinter import *
-from PIL import ImageTk, Image
+from DB_main import supabase
+from DB_CRUD_Functions import *
 
-def open_chatroom(previous_window, ip, port):
 
-    root_chat = Toplevel(previous_window)
-    root_chat.configure(bg="black")
-    previous_window.withdraw()
-
+def open_chatroom(code):
     ctk.set_appearance_mode("dark")
     ctk.set_default_color_theme("blue")
 
@@ -21,19 +16,19 @@ def open_chatroom(previous_window, ip, port):
     window_height = 600
 
     # get the screen dimension
-    screen_width = root_chat.winfo_screenwidth()
-    screen_height = root_chat.winfo_screenheight()
+    screen_width = root.winfo_screenwidth()
+    screen_height = root.winfo_screenheight()
 
     # find the center point
     center_x = int(screen_width / 2 - window_width / 2)
     center_y = int(screen_height / 2 - window_height / 2)
 
     # set the position of the window to the center of the screen
-    root_chat.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
-    root_chat.title("Data Room Virtuelle")
+    root.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
+    root.title("Data Room Virtuelle")
 
     # Create a frame for the chat
-    chat_frame = ctk.CTkFrame(root_chat)
+    chat_frame = ctk.CTkFrame(root)
     chat_frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
 
     # Create a chat box
@@ -41,7 +36,7 @@ def open_chatroom(previous_window, ip, port):
     chat_box.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
 
     # Create a frame for the message entry and send button
-    input_frame = ctk.CTkFrame(root_chat)
+    input_frame = ctk.CTkFrame(root)
     input_frame.pack(padx=10, pady=5, fill=tk.X)
 
     # Create a message entry box
@@ -52,7 +47,7 @@ def open_chatroom(previous_window, ip, port):
 
     # Upload a file
     def upload_file():
-        file_path = filedialog.askopenfilename()
+        file_path = tk.filedialog.askopenfilename()
         if file_path:
             display_message(chat_box, "Moi", f"File uploaded: {file_path}")
 
@@ -60,17 +55,24 @@ def open_chatroom(previous_window, ip, port):
     button = Image.open("Images/upload.png")
     resized_image = button.resize((40, 40))
     # Convertir l'image redimensionnée en format ImageTk.PhotoImage
-    image = ImageTk.PhotoImage(resized_image)
+    image = tk.ImageTk.PhotoImage(resized_image)
     upload_button = ctk.CTkButton(input_frame, image=image,text="Upload", command=upload_file)
     upload_button.pack(side=tk.LEFT, padx=10, pady=5)
 
     try:
-        #client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        #client.connect((ip, port))
+        print("Trying to connect to server...")
+        ip, port = get_last_server(supabase)
+        print(f"Server IP: {ip}, Port: {port}")
+        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        print("Socket created")
+        client.connect((ip, port))
         print(f"Connected to server at {ip}:{port}")
+
+        client.send(code.encode('utf-8'))
+        print(f"Joined channel {code}")
     except Exception as e:
         messagebox.showerror("Erreur", f"Impossible de se connecter au serveur : {e}")
-        root_chat.destroy()
+        root.destroy()
         previous_window.deiconify()  # Réafficher la fenêtre précédente
         return
 
@@ -81,7 +83,7 @@ def open_chatroom(previous_window, ip, port):
         message = message_entry.get()
         if message:
             try:
-                client.send(message.encode('ascii'))
+                client.send(message.encode('utf-8'))
                 display_message(chat_box, "Moi", message)
                 message_entry.delete(0, tk.END)
             except Exception as e:
@@ -111,9 +113,9 @@ def open_chatroom(previous_window, ip, port):
     def receive_messages():
         while True:
             try:
-                message = client.recv(1024).decode('ascii')
-                if message:
-                   display_message(chat_box, "Autre", message)
+                message = client.recv(1024).decode('utf-8')
+                if message and message != "Channel joined successfully.":  # Ignore the initial join message
+                    display_message(chat_box, "Autre", message)
             except Exception as e:
                 print("Erreur de réception des messages:", e)
                 break
@@ -123,9 +125,9 @@ def open_chatroom(previous_window, ip, port):
     receive_thread.start()
 
     def on_close():
-        root_chat.destroy()
+        root.destroy()
         previous_window.deiconify()
         previous_window.state('zoomed')
 
-    root_chat.protocol("WM_DELETE_WINDOW", on_close)
-    root_chat.mainloop()
+    root.protocol("WM_DELETE_WINDOW", on_close)
+    root.mainloop()

@@ -29,7 +29,7 @@ if __name__ == "__main__":
     root.state('zoomed')
     """
     # Background
-    image = Image.open("Images\\background.jpg")
+    image = Image.open("Images/background.jpg")
     image = image.resize((1300,700))
     background_image = ImageTk.PhotoImage(image)
     label = Label(root,image=background_image)

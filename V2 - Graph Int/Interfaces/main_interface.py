@@ -125,7 +125,7 @@ class MainInterface:
         self.heading_1.place(relx=0.065, y=90, width=1000, height=100)
 
         # GIF Animation Star ------------------------------------------
-        gif_path = 'videos/star_effect.gif'
+        gif_path = 'Videos/star_effect.gif'
 
         def get_frames(gif_path):
             frames = []
@@ -165,7 +165,7 @@ class MainInterface:
         label.place(x=110, y=250)
 
         # User Image Panel ----------------------------------------------------
-        image = Image.open("Images\\user.png")
+        image = Image.open(os.path.join("Images","user.png"))
         image = image.resize((60,60))
         image = ImageTk.PhotoImage(image)
         label = Label(self.frame, image=image,borderwidth=0,bg=cadre)
@@ -185,7 +185,7 @@ class MainInterface:
         self.username_line.place(x=500, y=339)
 
         # User laber logo ----------------------------------------------
-        username_icon = Image.open('images/user_label.png')
+        username_icon = Image.open('Images/user_label.png')
         resized_icon = username_icon.resize((20, 20))
         photo_user = ImageTk.PhotoImage(resized_icon)
         self.username_icon_label = Label(self.frame, image=photo_user, bg=cadre)
@@ -201,7 +201,7 @@ class MainInterface:
         self.passwd_line.place(x=500, y=410)
 
         # Password laber logo ----------------------------------------------
-        passwd_icon = Image.open('images/lock.png')
+        passwd_icon = Image.open('Images/lock.png')
         resized_icon = passwd_icon.resize((20, 20))
         photo_passwd = ImageTk.PhotoImage(resized_icon)
         self.passwd_icon_label = Label(self.frame, image=photo_passwd, bg=cadre)
@@ -240,7 +240,7 @@ class MainInterface:
         self.heading_1.place(relx=0.065, y=90, width=1000, height=100)
 
         # GIF Animation Star ------------------------------------------
-        gif_path = 'videos/create_account.gif'
+        gif_path = 'Videos/create_account.gif'
 
         def get_frames(gif_path):
             frames = []
@@ -271,7 +271,7 @@ class MainInterface:
         self.frame.after(0, update, 0)
 
         # User Image Panel ----------------------------------------------------
-        image = Image.open("Images\\user.png")
+        image = Image.open(os.path.join("Images","user.png"))
         image = image.resize((60,60))
         image = ImageTk.PhotoImage(image)
         label = Label(self.frame, image=image,borderwidth=0,bg=cadre)
@@ -291,7 +291,7 @@ class MainInterface:
         self.username_line.place(x=500, y=309)
 
         # User laber logo ----------------------------------------------
-        username_icon = Image.open('images/user_label.png')
+        username_icon = Image.open('Images/user_label.png')
         resized_icon = username_icon.resize((20, 20))
         photo_user = ImageTk.PhotoImage(resized_icon)
         self.username_icon_label = Label(self.frame, image=photo_user, bg=cadre)
@@ -307,7 +307,7 @@ class MainInterface:
         self.passwd_line.place(x=500, y=380)
 
         # Password laber logo ----------------------------------------------
-        passwd_icon = Image.open('images/lock.png')
+        passwd_icon = Image.open('Images","lock.png')
         resized_icon = passwd_icon.resize((20, 20))
         photo_passwd = ImageTk.PhotoImage(resized_icon)
         self.passwd_icon_label = Label(self.frame, image=photo_passwd, bg=cadre)
@@ -323,7 +323,7 @@ class MainInterface:
         self.passwd_line.place(x=500, y=450)
 
         # Confirm Password laber logo ----------------------------------------------
-        passwd_icon = Image.open('images/lock.png')
+        passwd_icon = Image.open(os.path.join("images","lock.png"))
         resized_icon = passwd_icon.resize((20, 20))
         photo_passwd = ImageTk.PhotoImage(resized_icon)
         self.passwd_icon_label = Label(self.frame, image=photo_passwd, bg=cadre)
@@ -366,7 +366,7 @@ class MainInterface:
         self.heading_1.place(relx=0.065, y=90, width=1000, height=100)
 
         # Image Utilisateur -----------------------------------------
-        image_path = "Images/user.png"
+        image_path = os.path.join("Images","user.png")
         image = Image.open(image_path)
         image = image.resize((60, 60))
         user_image = ImageTk.PhotoImage(image)
@@ -417,7 +417,7 @@ class MainInterface:
         self.confirm_passwd_var.trace_add("write",self.on_change)
 
         # Bouton pour retourner à l'authentification -----------------------------------
-        back_button_image = Image.open("Images/logo_next_before.png")
+        back_button_image = Image.open(os.path.join("Images","logo_next_before.png"))
         resized_image = back_button_image.resize((60, 60))
         back_button_photo = ImageTk.PhotoImage(resized_image)
         back_button = tk.Button(self.frame, image=back_button_photo, borderwidth=0, bg=cadre ,command=self.show_config)
@@ -446,7 +446,7 @@ class MainInterface:
         label.place(relx=0.07, rely=0.09)
 
         # USER SETTINGS BUTTON -------------------------------
-        button_user_settings = Image.open("Images/user_settings.png")
+        button_user_settings = Image.open(os.path.join("Images","user_settings.png"))
         resized_image = button_user_settings.resize((50, 50))
         # Convertir l'image redimensionnée en format ImageTk.PhotoImage
         image = ImageTk.PhotoImage(resized_image)
@@ -467,7 +467,7 @@ class MainInterface:
         # CONTENT -----------------------------------------------------------
 
         # Image
-        image_path = "Images\\phone.png"
+        image_path = os.path.join("Images","phone.png")
         image = Image.open(image_path)
         image = image.resize((230,230))
         image = ImageTk.PhotoImage(image)
@@ -477,9 +477,9 @@ class MainInterface:
 
         self.enter_code_label = tk.Label(self.frame, text="Enter room code", font=head2, bg=cadre, fg=letter)
         self.enter_code_label.place(relx=0.67, rely=0.37, anchor=tk.CENTER)
-        code_entry = CTkEntry(master=self.frame, corner_radius=20, fg_color='#ffffff', text_color="black", width=200, height=55, font=('Lexend', 30))
-        code_entry.place(relx=0.67, rely=0.45, anchor=tk.CENTER)
-        button_join = CTkButton(master=self.frame, text='Join', corner_radius=32, fg_color=button, hover_color=hover_button,text_color=letter_button, width=200, font=('Lexend', 30, 'bold'),command=lambda: self.connect_chatroom())
+        self.code_entry = CTkEntry(master=self.frame, corner_radius=20, fg_color='#ffffff', text_color="black", width=200, height=55, font=('Lexend', 30))
+        self.code_entry.place(relx=0.67, rely=0.45, anchor=tk.CENTER)
+        button_join = CTkButton(master=self.frame, text='Join', corner_radius=32, fg_color=button, hover_color=hover_button,text_color=letter_button, width=200, font=('Lexend', 30, 'bold'), command=self.connect_chatroom)
         button_join.place(relx=0.67, rely=0.55, anchor=tk.CENTER)
 
         self.or_label = tk.Label(self.frame, text="or", font=('Lexend', 20), bg=cadre, fg=letter)
@@ -490,7 +490,7 @@ class MainInterface:
         self.code_label = tk.Label(self.frame, text="", font=('Lexend', 30), bg=cadre, fg='white')
 
         # LOGOUT BUTTON -------------------------------
-        button_logout = Image.open("Images/logout_bl.png")
+        button_logout = Image.open(os.path.join("Images","logout_bl.png"))
         resized_image = button_logout.resize((53, 53))
         # Convertir l'image redimensionnée en format ImageTk.PhotoImage
         image = ImageTk.PhotoImage(resized_image)
@@ -612,8 +612,9 @@ class MainInterface:
             tk.messagebox.showerror("Erreur", "Nom d'utilisateur ou mot de passe incorrect.")
 
     def generate_code(self):
-        # Générer un code aléatoire de 8 caractères
+        # Générer un code aléatoire de 7 caractères
         code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=7))
+        add_code(supabase, code)
         self.code_label.config(text=code)
         self.code_label.place(relx=0.67, rely=0.65, anchor=tk.CENTER)
 
@@ -621,16 +622,14 @@ class MainInterface:
         self.button_generate.destroy()
 
         # Créer un nouveau bouton avec le texte et la commande mis à jour
-        self.button_enter_room = CTkButton(master=self.frame, text='Enter room', corner_radius=32, fg_color="#FE9900", text_color=letter_button,hover_color="#C27602", width=200, font=('Lexend', 30, 'bold'),command=lambda: self.connect_Client)
+        self.button_enter_room = CTkButton(master=self.frame, text='Enter room', corner_radius=32, fg_color="#FE9900", text_color=letter_button,hover_color="#C27602", width=200, font=('Lexend', 30, 'bold'),command=lambda: self.connect_chatroom_hosting())
         self.button_enter_room.place(relx=0.67, rely=0.75, anchor=tk.CENTER)
 
-        copy_image_path = "Images/copy.png"
+        copy_image_path = os.path.join("Images","copy.png")
         copy_image = Image.open(copy_image_path).convert("RGBA")
         copy_image = copy_image.resize((20, 20))
         copy_image = ImageTk.PhotoImage(copy_image)
 
-        #Changer la méthode pour récupérer les IP et port
-        #add_session(supabase, code, None, None, "IP_privee_here", 12345)
 
         self.button_copy_code = CTkButton(master=self.frame, image=copy_image, text='', corner_radius=5, fg_color="#040D15",hover_color=hover_button, width=20, font=('Lexend', 15, 'bold'),command=self.copy_to_clipboard(code))
         self.button_copy_code.place(relx=0.81, rely=0.65, anchor=tk.CENTER)
@@ -642,23 +641,30 @@ class MainInterface:
 
 # ------------------------------------------------- Connection ------------------------------------------
 
-    #ALERT : Connection Success
+    # ALERT : Connection Success
     def connect_chatroom(self):
         code = self.code_entry.get()
         if code:
             try:
-                # Récupérer les informations de session à partir du code
-                ip_public = get_IP_public(supabase, code)
-                port_server = get_Port_Server(supabase, code)
-                ip_privee = get_IP_privee(supabase, code)
-                port_privee = get_Port_privee(supabase, code)
-
                 # Connecter à la chatroom en utilisant les informations récupérées
-                open_chatroom(self.master,ip_privee, port_privee)
+                open_chatroom(code)
+
+                print("Info", "Connecté à la chatroom avec succès.")
+            except IndexError:
+                tk.messagebox.showerror("Erreur", "Code de session invalide.")
+        else:
+            tk.messagebox.showerror("Erreur", "Veuillez entrer un code de session.")
+
+    def connect_chatroom_hosting(self):
+        code = self.code_label.cget("text")
+
+        if code:
+            try:
+                # Connecter à la chatroom en utilisant les informations récupérées
+                open_chatroom(code)
 
                 tk.messagebox.showinfo("Info", "Connecté à la chatroom avec succès.")
             except IndexError:
                 tk.messagebox.showerror("Erreur", "Code de session invalide.")
         else:
             tk.messagebox.showerror("Erreur", "Veuillez entrer un code de session.")
-
