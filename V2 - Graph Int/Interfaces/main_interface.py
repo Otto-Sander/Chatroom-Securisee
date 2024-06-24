@@ -95,7 +95,6 @@ class MainInterface:
         self.heading_3 = Label(self.frame, text=txt_intro3, font=head3, bg=cadre, fg=letter, justify=LEFT,anchor="w")
         self.heading_3.place(relx=0.45, rely=0.32, width=400, height=200)
 
-
         # BOUTON-------------------------------------------
         button = Image.open("Images\logo_next.png")
         resized_image = button.resize((70, 70))
@@ -119,7 +118,6 @@ class MainInterface:
         head = "Authentication"
         self.heading_1 = Label(self.frame, text=head, font=head1, bg=cadre, fg=letter, justify=LEFT,anchor="nw")
         self.heading_1.place(relx=0.065, rely=0.08, width=1000, height=100)
-
 
         #Introduction : 1 -----------------------------------------
         txt = "Please log in with\nyour login details to access the chat and document sharing area."
@@ -481,7 +479,7 @@ class MainInterface:
         self.enter_code_label.place(relx=0.67, rely=0.37, anchor=tk.CENTER)
         code_entry = CTkEntry(master=self.frame, corner_radius=20, fg_color='#ffffff', text_color="black", width=200, height=55, font=('Lexend', 30))
         code_entry.place(relx=0.67, rely=0.45, anchor=tk.CENTER)
-        button_join = CTkButton(master=self.frame, text='Join', corner_radius=32, fg_color=button, hover_color=hover_button,text_color=letter_button, width=200, font=('Lexend', 30, 'bold'))
+        button_join = CTkButton(master=self.frame, text='Join', corner_radius=32, fg_color=button, hover_color=hover_button,text_color=letter_button, width=200, font=('Lexend', 30, 'bold'),command=lambda: self.connect_chatroom())
         button_join.place(relx=0.67, rely=0.55, anchor=tk.CENTER)
 
         self.or_label = tk.Label(self.frame, text="or", font=('Lexend', 20), bg=cadre, fg=letter)
@@ -656,7 +654,7 @@ class MainInterface:
                 port_privee = get_Port_privee(supabase, code)
 
                 # Connecter à la chatroom en utilisant les informations récupérées
-                open_chatroom(ip_privee, port_privee)
+                open_chatroom(self.master,ip_privee, port_privee)
 
                 tk.messagebox.showinfo("Info", "Connecté à la chatroom avec succès.")
             except IndexError:

@@ -20,12 +20,14 @@ import tkinter as tk
 from main_interface import MainInterface
 from tkinter import *
 from PIL import ImageTk, Image
+from open_chatroom import open_chatroom
 
 #MainLoop
 if __name__ == "__main__":
     #Fenêtre principale
     root = tk.Tk()
     root.state('zoomed')
+    """
     # Background
     image = Image.open("Images\\background.jpg")
     image = image.resize((1300,700))
@@ -35,3 +37,5 @@ if __name__ == "__main__":
     #Lance l'application
     app = MainInterface(root)
     root.mainloop()
+    """
+    open_chatroom(root,"ee",32)
