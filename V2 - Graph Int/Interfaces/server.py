@@ -2,6 +2,8 @@ import socket
 import threading
 from DB_CRUD_Functions import *
 from DB_main import supabase
+from crypto_utils import *
+from rsa import *
 
 lock = threading.Lock()
 server_socket = None
@@ -36,42 +38,44 @@ def find_free_port():
     s.close()
     return port
 
-def client_handler(client_socket, client_address, channel_code, connections, lock):
+def generate_aes_key():
+    return AES.get_random_bytes(32)  # AES key generation (256 bits)
+
+def rsa_encrypt(message, public_key):
+    rsa_public_key = RSA.importKey(base64.b64decode(public_key))
+    cipher = PKCS1_OAEP.new(rsa_public_key)
+    encrypted_message = cipher.encrypt(message)
+    return base64.b64encode(encrypted_message).decode('utf-8')
+
+
+def client_handler(client_socket, client_address, channel_code, connections, lock, public_key):
     try:
-        # Handle client messages within a specific channel
+        aes_key = generate_aes_key()
+        encrypted_aes_key = rsa_encrypt(aes_key, public_key)
+        client_socket.send(base64.b64encode(encrypted_aes_key))
+
         while True:
-            message = client_socket.recv(1024)
+            message = client_socket.recv(1024).decode('ascii')
             if message:
-                print(f"Message from {client_address} in channel {channel_code}: {message}")
                 with lock:
                     for connection in connections[channel_code]:
-                        if connection != client_socket:
-                            connection.send(message)
-            else:
-                break
+                        if connection[0] != client_socket:
+                            connection[0].send(message.encode('ascii'))
     except Exception as e:
-        print(f"Client handler error in channel {channel_code}: {e}")
+        print(f"Error in client handler: {e}")
     finally:
         with lock:
-            connections[channel_code].remove(client_socket)
+            connections[channel_code].remove((client_socket, public_key))
         client_socket.close()
 
-def join_channel(client_socket, channel_code, connections, lock):
-    try:
-        if channel_code in connections:
-            connections[channel_code].append(client_socket)
-        else:
-            connections[channel_code] = [client_socket]
 
-        client_socket.send(b"Channel joined successfully.")
+def join_channel(client_socket, channel_code, connections, lock, public_key):
+    with lock:
+        if channel_code not in connections:
+            connections[channel_code] = []
+        connections[channel_code].append((client_socket, public_key))
 
-        # Start client handler thread for this client and channel
-        threading.Thread(target=client_handler,
-                         args=(client_socket, client_socket.getpeername(), channel_code, connections, lock)).start()
-
-    except Exception as e:
-        print(f"Error joining channel {channel_code}: {e}")
-        client_socket.close()
+    threading.Thread(target=client_handler, args=(client_socket, client_socket.getpeername(), channel_code, connections, lock, public_key)).start()
 
 def start_server():
     ip = get_private_ip()
@@ -82,25 +86,18 @@ def start_server():
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     server_socket.bind((ip, port))
     add_server(supabase, ip, port)
-
     server_socket.listen(5)
     print("Server listening on", server_socket.getsockname(), "...")
 
-    connections = {}  # Initialize a dictionary for all connections by channel
-    lock = threading.Lock()
+    connections = {}
 
     try:
         while True:
             client_socket, client_address = server_socket.accept()
-            print(f"Accepted a new connection from {client_address}")
-
-            # Receive the channel code from the client
+            public_key = client_socket.recv(4096).decode('utf-8')  # Assuming public key sent right after connection
             channel_code = client_socket.recv(1024).decode('utf-8')
-            print(f"Client connected to channel: {channel_code}")
-
-            # Join the channel
-            join_channel(client_socket, channel_code, connections, lock)
-
+            print(f"Accepted new connection from {client_address} in channel {channel_code}")
+            join_channel(client_socket, channel_code, connections, lock, public_key)
     except Exception as e:
         print("Server error:", e)
     finally:
