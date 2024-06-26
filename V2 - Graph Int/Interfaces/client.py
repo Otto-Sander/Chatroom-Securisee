@@ -6,13 +6,6 @@ import os
 
 
 
-def aes_decrypt(encrypted_message, key):
-    encrypted_message = base64.b64decode(encrypted_message)
-    nonce, tag, ciphertext = encrypted_message[:16], encrypted_message[16:32], encrypted_message[32:]
-    cipher = AES.new(key, AES.MODE_EAX, nonce=nonce)
-    decrypted_message = cipher.decrypt_and_verify(ciphertext, tag)
-    return decrypted_message.decode('utf-8')
-
 def enter_server(ip, port):
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_socket.connect((ip, port))

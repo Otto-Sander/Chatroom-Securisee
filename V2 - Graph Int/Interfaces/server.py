@@ -41,12 +41,6 @@ def find_free_port():
 def generate_aes_key():
     return AES.get_random_bytes(32)  # AES key generation (256 bits)
 
-def rsa_encrypt(message, public_key):
-    rsa_public_key = RSA.importKey(base64.b64decode(public_key))
-    cipher = PKCS1_OAEP.new(rsa_public_key)
-    encrypted_message = cipher.encrypt(message)
-    return base64.b64encode(encrypted_message).decode('utf-8')
-
 
 def client_handler(client_socket, client_address, channel_code, connections, lock, public_key):
     try:
