@@ -33,7 +33,6 @@ import client
 from DB_Additional_Functions import *
 from DB_CRUD_Functions import *
 
-
 # ------------------------ COLOR DESIGN ----------------------------------
 cadre = '#0A1A29'
 back = '#1A1E88'
@@ -48,6 +47,7 @@ head2 = ("Lexend", 19)
 head3 = ("Lexend", 15)
 head4 = ("Lexend", 11)
 head4_button = ("Lexend", 9)
+# -------------------------------------------------------------------------
 
 #Classe principale de login
 class MainInterface:
@@ -62,6 +62,9 @@ class MainInterface:
             "passwd": "admin"
         }
 # -----------------------------------------------------------------------------------------
+
+        width_win= master.winfo_screenwidth() 
+        height_win= master.winfo_screenheight()
 
         self.supabase = supabase
         self.master = master
@@ -101,7 +104,7 @@ class MainInterface:
         # Convertir l'image redimensionnée en format ImageTk.PhotoImage
         image = ImageTk.PhotoImage(resized_image)
         # Créer le bouton avec l'image redimensionnée
-        self.roundedbutton = tk.Button(self.frame, image=image, bd=0, borderwidth=0,bg=cadre,command=self.show_authentication)
+        self.roundedbutton = tk.Button(self.frame, image=image, bd=0, borderwidth=0,bg=cadre,command=self.show_user_settings)
         self.roundedbutton.image = image  # Gardez une référence à l'image pour éviter la collecte des déchets
         self.roundedbutton.place(x=720, y=450)
         #-----------------------------------------------------
@@ -284,11 +287,11 @@ class MainInterface:
 
         # Username ------------------------------------------------------
         self.username_label = Label(self.frame, text='Username', bg=cadre, font=('yu gothic ui', 13, 'bold'),fg=letter)
-        self.username_label.place(x=500, y=250)
+        self.username_label.place(x=500, y=180)
         self.username_entry = Entry(self.frame, highlightthickness=0, relief=FLAT, bg=cadre, fg='#D4D4D4',font=('yu gothic ui', 12))
-        self.username_entry.place(x=525, y=282, width=270)
+        self.username_entry.place(x=525, y=213, width=270)
         self.username_line = Canvas(self.frame, width=300, height=2.0, bg='#bdb9b1', highlightthickness=0)
-        self.username_line.place(x=500, y=309)
+        self.username_line.place(x=500, y=240)
 
         # User laber logo ----------------------------------------------
         username_icon = Image.open('Images/user_label.png')
@@ -296,7 +299,25 @@ class MainInterface:
         photo_user = ImageTk.PhotoImage(resized_icon)
         self.username_icon_label = Label(self.frame, image=photo_user, bg=cadre)
         self.username_icon_label.image = photo_user
-        self.username_icon_label.place(x=500, y=282)
+        self.username_icon_label.place(x=500, y=213)
+
+        # Username ------------------------------------------------------
+        self.email_label = Label(self.frame, text='Email', bg=cadre, font=('yu gothic ui', 13, 'bold'),fg=letter)
+        self.email_label.place(x=500, y=250)
+        self.email_entry = Entry(self.frame, highlightthickness=0, relief=FLAT, bg=cadre, fg='#D4D4D4',font=('yu gothic ui', 12))
+        self.email_entry.place(x=525, y=282, width=270)
+        self.email_line = Canvas(self.frame, width=300, height=2.0, bg='#bdb9b1', highlightthickness=0)
+        self.email_line.place(x=500, y=309)
+
+        # User laber logo ----------------------------------------------
+        email_icon = Image.open('Images/user_label.png')
+        resized_icon = email_icon.resize((20, 20))
+        photo_user = ImageTk.PhotoImage(resized_icon)
+        self.email_icon_label = Label(self.frame, image=photo_user, bg=cadre)
+        self.email_icon_label.image = photo_user
+        self.email_icon_label.place(x=500, y=282)
+
+        
 
         # Password ------------------------------------------------------
         self.passwd_label = Label(self.frame, text='Password', bg=cadre, font=('yu gothic ui', 13, 'bold'),fg=letter)
@@ -307,7 +328,7 @@ class MainInterface:
         self.passwd_line.place(x=500, y=380)
 
         # Password laber logo ----------------------------------------------
-        passwd_icon = Image.open('Images","lock.png')
+        passwd_icon = Image.open('Images/lock.png')
         resized_icon = passwd_icon.resize((20, 20))
         photo_passwd = ImageTk.PhotoImage(resized_icon)
         self.passwd_icon_label = Label(self.frame, image=photo_passwd, bg=cadre)
@@ -530,7 +551,7 @@ class MainInterface:
     def create_user(self):
         new_username = self.username_entry.get()
         new_password = self.passwd_entry.get()
-        #new_mail = self.mail_entry.get()
+        new_email = self.email_entry.get()
         confirm_password = self.confirm_passwd_entry.get()
 
         if new_password != confirm_password:
@@ -544,10 +565,10 @@ class MainInterface:
             if existing_users:
                 tk.messagebox.showerror("Erreur", "Le nom d'utilisateur existe déjà.")
                 return
-            #existing_emails = supabase.table("utilisateurs").select("*").eq("mail", new_mail).execute().data
-            #if existing_emails:
-            #    tk.messagebox.showerror("Erreur", "L'email existe déjà.")
-            #    return
+            existing_emails = supabase.table("utilisateurs").select("*").eq("mail", new_email).execute().data
+            if existing_emails:
+                tk.messagebox.showerror("Erreur", "L'email existe déjà.")
+                return
 
             # Hacher le mot de passe
             hashed_password = self.password_hash(new_password)
