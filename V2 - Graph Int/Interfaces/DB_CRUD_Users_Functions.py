@@ -5,7 +5,8 @@
 #Fonction pour récuper les infos de l'utilisateur authentifé
 #Retourne un dictionnaire de toutes les infos de cet utilisateur
 def get_user_all(client, mail):
-    data = client.table("auth").select("*").eq("email", mail).execute()
+    data = client.table("profile").select("*").eq("email", mail).execute()
+    print("data:",data)
     return data.data
 
 
@@ -38,7 +39,7 @@ def update_user_mail(client, newMail):
 #Fonction pour modifier le mot de passe d'un utilisateur authentifié (l'utilisateur doit être log in)
 def update_user_password(client, newPassword):
     data = client.auth.update_user({"password": newPassword})
-
+ 
 #Fonction pour modifier le pseudo d'un utilisateur
 def update_user_username(client, newUsername, email):
-    data = client.table("profile").update({"username": newUsername}).eq("email", email).execute
+    data = client.table("profile").update({"username": newUsername}).eq("email", email).execute()
