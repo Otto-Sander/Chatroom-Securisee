@@ -5,7 +5,7 @@
 #Fonction pour récuper les infos de l'utilisateur authentifé
 #Retourne un dictionnaire de toutes les infos de cet utilisateur
 def get_user_all(client, mail):
-    data = client.table("profile").select("*").eq("email", mail).execute()
+    data = client.table("auth").select("*").eq("email", mail).execute()
     return data.data
 
 
