@@ -3,6 +3,7 @@ from DB_CRUD_Users_Functions import *
 
 #Fonction qui vérifie si un utilisateur existe dans la database
 def is_user_in_database(client, mail):
+    print(mail)
     data = get_user_all(client, mail)
     if(data == []):
         print("This user is not in the dataBase !  :(")
