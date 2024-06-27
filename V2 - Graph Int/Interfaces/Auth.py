@@ -21,3 +21,13 @@ def log_in_user(client, email, password):
 #Fonction qui déconnecte un utilisateur
 def log_out_user(client):
     res = client.auth.sign_out()
+
+# Fonction qui retourne l'id de l'utilisateur qui est connecté
+def get_current_connected_user_id(client):
+    data = client.auth.get_user()
+    return data.user.id
+
+# Fonction qui retourne le mail de l'utilisateur qui est connecté
+def get_current_connected_user_email(client):
+    data = client.auth.get_user()
+    return data.user.email
