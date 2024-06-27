@@ -18,7 +18,9 @@ def create_new_connection(client, user_id, channel_code, ip, port):
 ###############################
 # READ FUNCTIONS
 ###############################
-
+def get_last_server(client):
+    data = client.table("server").select("*").execute()
+    return data.data[-1]["IP"], data.data[-1]["port"]
 
 # Fonction récupère toutes les infos d'un serv
 def get_server_all(client, id):
@@ -49,6 +51,11 @@ def get_session_id(client, code):
 def get_session_password(client, code):
     data = client.table("session").select("password").eq("code", code).execute()
     return data.data[0]["password"]
+
+# Fonction qui retourne l'id des utilisateurs d'une session
+def get_session_users(client, code):
+    data = client.table("session").select("id_user1", "id_user2", "id_user3", "id_user4", "id_user5", "id_user6", "id_user7", "id_user8", "id_user9", "id_user10").eq("code", code).execute()
+    return data.data[0]
 
 # Fonction qui retourne toutes les infos d'une connection
 def get_connection_all(client, user_id):

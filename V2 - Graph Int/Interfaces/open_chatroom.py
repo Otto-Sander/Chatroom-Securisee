@@ -5,10 +5,11 @@ import datetime
 from PIL import ImageTk,Image
 import threading
 import os
-# from DB_main import supabase
-# from DB_CRUD_Functions import *
-
-
+from DB_main import supabase
+from DB_CRUD_Functions import *
+from DB_CRUD_Users_Functions import *
+from Auth import *
+import socket
 
 def open_chatroom(previous_win,width_win,height_win,code):
 
@@ -78,9 +79,9 @@ def open_chatroom(previous_win,width_win,height_win,code):
         print("Socket created")
         client.connect((ip, port))
         print(f"Connected to server at {ip}:{port}")
-
         client.send(code.encode('utf-8'))
         print(f"Joined channel {code}")
+        client.send(get_current_connected_user_id(supabase).encode('utf-8'))
     except Exception as e:
         messagebox.showerror("Erreur", f"Impossible de se connecter au serveur : {e}")
         on_close()
