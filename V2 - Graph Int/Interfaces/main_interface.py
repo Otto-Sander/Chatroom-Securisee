@@ -597,6 +597,8 @@ class MainInterface:
             # Si le mail est modifié
             if new_email != self.mail:
                 update_user_mail(supabase,new_email)
+            
+            print("email: ",self.mail)
             update_user_username(supabase,new_username,self.mail)
             
             tk.messagebox.showinfo("Succès", "Your account has been successfully modified !")

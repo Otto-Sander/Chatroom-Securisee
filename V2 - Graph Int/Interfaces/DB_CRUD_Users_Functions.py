@@ -42,4 +42,4 @@ def update_user_password(client, newPassword):
  
 #Fonction pour modifier le pseudo d'un utilisateur
 def update_user_username(client, newUsername, email):
-    data = client.table("profile").update({"username": newUsername}).eq("email", email).execute
+    data = client.table("profile").update({"username": newUsername}).eq("email", email).execute()
