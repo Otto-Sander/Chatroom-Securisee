@@ -3,7 +3,7 @@ import threading
 import json
 import os
 
-def enter_server(ip,port):
+def enter_server(ip,port,canal):
     os.system('cls||clear')
     try:
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

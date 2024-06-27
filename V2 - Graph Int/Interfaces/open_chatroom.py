@@ -1,17 +1,33 @@
 import customtkinter as ctk
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import filedialog, messagebox
 import datetime
-import socket
+from PIL import ImageTk,Image
 import threading
-from DB_main import supabase
-from DB_CRUD_Functions import *
+import os
+# from DB_main import supabase
+# from DB_CRUD_Functions import *
 
-def open_chatroom(code):
+
+
+def open_chatroom(previous_win,width_win,height_win,code):
+
+    def on_close():
+        root.destroy()
+        previous_win.deiconify()
+        previous_win.geometry(f"{width_win}x{height_win}")
+        previous_win.state('normal')
+        print("Width :",width_win,"Height:",height_win)
+        previous_win.attributes("-alpha", 1.0)
+        print("ok")
+
+    previous_win.withdraw()
+
+    root = ctk.CTk()
+
     ctk.set_appearance_mode("dark")
     ctk.set_default_color_theme("blue")
 
-    root = ctk.CTk()
     window_width = 600
     window_height = 600
 
@@ -36,12 +52,23 @@ def open_chatroom(code):
     chat_box.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
 
     # Create a frame for the message entry and send button
-    input_frame = ctk.CTkFrame(root)
+    input_frame = tk.Frame(root)
     input_frame.pack(padx=10, pady=5, fill=tk.X)
 
     # Create a message entry box
     message_entry = ctk.CTkEntry(input_frame, placeholder_text="Écrire un message...")
     message_entry.pack(side=tk.LEFT, padx=10, pady=5, fill=tk.X, expand=True)
+
+    message_entry.bind("<Return>", lambda event: send_message(chat_box, message_entry, client))
+
+    # Upload a file
+    def upload_file():
+        file_path = filedialog.askopenfilename()
+        if file_path:
+            display_message(chat_box, "Moi", f"File uploaded: {file_path}")
+
+    upload_button = ctk.CTkButton(input_frame, text="Upload File", command= upload_file)
+    upload_button.pack(side=tk.LEFT, padx=10, pady=5)
 
     try:
         print("Trying to connect to server...")
@@ -52,21 +79,21 @@ def open_chatroom(code):
         client.connect((ip, port))
         print(f"Connected to server at {ip}:{port}")
 
-        client.send(code.encode('ascii'))
+        client.send(code.encode('utf-8'))
         print(f"Joined channel {code}")
     except Exception as e:
         messagebox.showerror("Erreur", f"Impossible de se connecter au serveur : {e}")
+        on_close()
         return
 
     # Create a send button
-    send_button = ctk.CTkButton(input_frame, text="Envoyer", command=lambda: send_message(chat_box, message_entry, client))
-    send_button.pack(side=tk.LEFT, padx=10, pady=5)
+    client = "e"
 
     def send_message(chat_box, message_entry, client):
         message = message_entry.get()
         if message:
             try:
-                client.send(message.encode('ascii'))
+                client.send(message.encode('utf-8'))
                 display_message(chat_box, "Moi", message)
                 message_entry.delete(0, tk.END)
             except Exception as e:
@@ -88,16 +115,16 @@ def open_chatroom(code):
         chat_box.configure(state=tk.NORMAL)
         chat_box.tag_config("time", foreground="#888888")
         chat_box.tag_config("user", background=bg_color, foreground=text_color)
-        chat_box.insert(tk.END, f"({current_time_string}) ","time")
-        chat_box.insert(tk.END,f"{user}: {message}\n", "user")
+        chat_box.insert(tk.END, f"({current_time_string}) ", "time")
+        chat_box.insert(tk.END, f"{user}: {message}\n", "user")
         chat_box.configure(state=tk.DISABLED)
         chat_box.see(tk.END)
 
     def receive_messages():
         while True:
             try:
-                message = client.recv(1024).decode('ascii')
-                if message:
+                message = client.recv(1024).decode('utf-8')
+                if message and message != "Channel joined successfully.":  # Ignore the initial join message
                     display_message(chat_box, "Autre", message)
             except Exception as e:
                 print("Erreur de réception des messages:", e)
@@ -107,4 +134,6 @@ def open_chatroom(code):
     receive_thread.daemon = True  # Permet au thread de se fermer lorsque la fenêtre principale est fermée
     receive_thread.start()
 
+    root.protocol("WM_DELETE_WINDOW", on_close())
     root.mainloop()
+
