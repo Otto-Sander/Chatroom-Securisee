@@ -551,6 +551,8 @@ class MainInterface:
             tk.messagebox.showerror("Erreur", "Veuillez remplir tous les champs.")
         elif new_email_create in all_user_mail:
             tk.messagebox.showerror("Erreur", "L'email existe déjà.")
+        elif len(new_password_create) < 6:
+            tk.messagebox.showerror("Errueur", "Password must contains at least 6 characters")
         else:
             # Hacher le mot de passe
             #hashed_password = self.password_hash(new_password)
