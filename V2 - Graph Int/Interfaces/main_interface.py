@@ -277,41 +277,29 @@ class MainInterface:
         gif_label.place(x=150, y=220)  # Positionnement du GIF
         self.frame.after(0, update, 0)
 
-        # User Image Panel ----------------------------------------------------
-        image = Image.open(os.path.join("Images","user.png"))
-        image = image.resize((60,60))
-        image = ImageTk.PhotoImage(image)
-        label = Label(self.frame, image=image,borderwidth=0,bg=cadre)
-        label.image = image  # Référence nécessaire pour empêcher la collecte des déchets
-        label.place(x=620, y=160)
-
-        # Sign Up Label -------------------------------------------------
-        self.sign_in_label = Label(self.frame, text='Sign In',bg=cadre,fg=letter,font=head4)
-        self.sign_in_label.place(x=624, y=225)
-
         # Username ------------------------------------------------------
-        self.username_label = Label(self.frame, text='Username', bg=cadre, font=('yu gothic ui', 13, 'bold'),fg=letter)
-        self.username_label.place(x=500, y=180)
-        self.username_entry = Entry(self.frame, highlightthickness=0, relief=FLAT, bg=cadre, fg='#D4D4D4',font=('yu gothic ui', 12))
-        self.username_entry.place(x=525, y=213, width=270)
-        self.username_line = Canvas(self.frame, width=300, height=2.0, bg='#bdb9b1', highlightthickness=0)
-        self.username_line.place(x=500, y=240)
+        self.username_create_label = Label(self.frame, text='Username', bg=cadre, font=('yu gothic ui', 13, 'bold'),fg=letter)
+        self.username_create_label.place(x=500, y=180)
+        self.username_create_entry = Entry(self.frame, highlightthickness=0, relief=FLAT, bg=cadre, fg='#D4D4D4',font=('yu gothic ui', 12))
+        self.username_create_entry.place(x=525, y=213, width=270)
+        self.username_create_line = Canvas(self.frame, width=300, height=2.0, bg='#bdb9b1', highlightthickness=0)
+        self.username_create_line.place(x=500, y=240)
 
         # User laber logo ----------------------------------------------
-        username_icon = Image.open('Images/user_label.png')
-        resized_icon = username_icon.resize((20, 20))
-        photo_user = ImageTk.PhotoImage(resized_icon)
+        username_create_icon = Image.open('Images/user_label.png')
+        resized_create_icon = username_create_icon.resize((20, 20))
+        photo_user = ImageTk.PhotoImage(resized_create_icon)
         self.username_icon_label = Label(self.frame, image=photo_user, bg=cadre)
         self.username_icon_label.image = photo_user
         self.username_icon_label.place(x=500, y=213)
 
         # Username ------------------------------------------------------
-        self.email_label = Label(self.frame, text='Email', bg=cadre, font=('yu gothic ui', 13, 'bold'),fg=letter)
-        self.email_label.place(x=500, y=250)
-        self.email_entry = Entry(self.frame, highlightthickness=0, relief=FLAT, bg=cadre, fg='#D4D4D4',font=('yu gothic ui', 12))
-        self.email_entry.place(x=525, y=282, width=270)
-        self.email_line = Canvas(self.frame, width=300, height=2.0, bg='#bdb9b1', highlightthickness=0)
-        self.email_line.place(x=500, y=309)
+        self.email_create_label = Label(self.frame, text='Email', bg=cadre, font=('yu gothic ui', 13, 'bold'),fg=letter)
+        self.email_create_label.place(x=500, y=250)
+        self.email_create_entry = Entry(self.frame, highlightthickness=0, relief=FLAT, bg=cadre, fg='#D4D4D4',font=('yu gothic ui', 12))
+        self.email_create_entry.place(x=525, y=282, width=270)
+        self.email_create_line = Canvas(self.frame, width=300, height=2.0, bg='#bdb9b1', highlightthickness=0)
+        self.email_create_line.place(x=500, y=309)
 
         # User laber logo ----------------------------------------------
         email_icon = Image.open('Images/user_label.png')
@@ -324,12 +312,12 @@ class MainInterface:
         
 
         # Password ------------------------------------------------------
-        self.passwd_label = Label(self.frame, text='Password', bg=cadre, font=('yu gothic ui', 13, 'bold'),fg=letter)
-        self.passwd_label.place(x=500, y=320)
-        self.passwd_entry = Entry(self.frame, highlightthickness=0, relief=FLAT, bg=cadre, fg='#D4D4D4',font=('yu gothic ui', 12),show="*")
-        self.passwd_entry.place(x=525, y=353, width=270)
-        self.passwd_line = Canvas(self.frame, width=300, height=2.0, bg='#bdb9b1', highlightthickness=0)
-        self.passwd_line.place(x=500, y=380)
+        self.passwd_create_label = Label(self.frame, text='Password', bg=cadre, font=('yu gothic ui', 13, 'bold'),fg=letter)
+        self.passwd_create_label.place(x=500, y=320)
+        self.passwd_create_entry = Entry(self.frame, highlightthickness=0, relief=FLAT, bg=cadre, fg='#D4D4D4',font=('yu gothic ui', 12),show="*")
+        self.passwd_create_entry.place(x=525, y=353, width=270)
+        self.passwd_create_line = Canvas(self.frame, width=300, height=2.0, bg='#bdb9b1', highlightthickness=0)
+        self.passwd_create_line.place(x=500, y=380)
 
         # Password laber logo ----------------------------------------------
         passwd_icon = Image.open('Images/lock.png')
@@ -340,10 +328,10 @@ class MainInterface:
         self.passwd_icon_label.place(x=500, y=353)
 
         # Confirm Password ------------------------------------------------------
-        self.passwd_label = Label(self.frame, text='Confirm Password', bg=cadre, font=('yu gothic ui', 13, 'bold'),fg=letter)
-        self.passwd_label.place(x=500, y=390)
-        self.confirm_passwd_entry = Entry(self.frame, highlightthickness=0, relief=FLAT, bg=cadre, fg='#D4D4D4',font=('yu gothic ui', 12),show="*")
-        self.confirm_passwd_entry.place(x=525, y=413, width=270)
+        self.passwd_create_label = Label(self.frame, text='Confirm Password', bg=cadre, font=('yu gothic ui', 13, 'bold'),fg=letter)
+        self.passwd_create_label.place(x=500, y=390)
+        self.confirm_passwd_create_entry = Entry(self.frame, highlightthickness=0, relief=FLAT, bg=cadre, fg='#D4D4D4',font=('yu gothic ui', 12),show="*")
+        self.confirm_passwd_create_entry.place(x=525, y=413, width=270)
         self.passwd_line = Canvas(self.frame, width=300, height=2.0, bg='#bdb9b1', highlightthickness=0)
         self.passwd_line.place(x=500, y=450)
 
@@ -356,8 +344,8 @@ class MainInterface:
         self.passwd_icon_label.place(x=500, y=413)
 
         # Create Button ------------------------------------
-        button = CTkButton(master=self.frame,text='Create',corner_radius=32,fg_color='#4158D0',hover_color='#C850C0',width=300,font=head3,command=self.create_user)
-        button.place(x=500,y=475)
+        button_create_user = CTkButton(master=self.frame,text='Create',corner_radius=32,fg_color='#4158D0',hover_color='#C850C0',width=300,font=head3,command=self.create_user)
+        button_create_user.place(x=500,y=475)
 
         # BOUTON-------------------------------------------
         button = Image.open("Images\logo_next_before.png")
@@ -525,7 +513,7 @@ class MainInterface:
     def save_user_modifications(self):
         self.user_data["username"] = self.username_var.get()
         self.user_data["passwd"] = self.email_var.get()
-        tk.messagebox.showinfo("Info", "Données sauvegardées avec succès!")
+        tk.messagebox.showinfo("Info", "Data saved successfully!")
         self.save_settings_button.config(state=tk.DISABLED)
 
     def on_change(self, *args):
@@ -550,35 +538,30 @@ class MainInterface:
 
     #ALERT : Create User failed
     def create_user(self):
-        new_username = self.username_entry.get()
-        new_password = self.passwd_entry.get()
-        new_email = self.email_entry.get()
-        confirm_password = self.confirm_passwd_entry.get()
+        new_username_create = self.username_create_entry.get()
+        new_password_create = self.passwd_create_entry.get()
+        new_email_create = self.email_create_entry.get()
+        confirm_password_create = self.confirm_passwd_create_entry.get()
 
-        if new_password != confirm_password:
-            tk.messagebox.showerror("Erreur", "Les mots de passe ne correspondent pas.")
-        elif new_username == "" or new_password == "" or confirm_password == "":
-            tk.messagebox.showerror("Erreur", "Veuillez remplir tous les champs.")
+        all_user_mail = get_user_all_mail(supabase)
+
+        if new_password_create != confirm_password_create:
+            tk.messagebox.showerror("Error", "Incorrect password confirmation.")
+        elif new_username_create == "" or new_password_create == "" or confirm_password_create == "":
+            tk.messagebox.showerror("Error", "Please fill in all the fields.")
+        elif new_email_create in all_user_mail:
+            tk.messagebox.showerror("Error", "The email already exist.")
+        elif len(new_password_create) < 6:
+            tk.messagebox.showerror("Error", "Password must contains at least 6 characters")
         else:
-            # Enregistrer le nouvel utilisateur (code à implémenter)
-            # Par exemple, vous pouvez enregistrer les informations dans une base de données ou un fichier.
-            existing_users = (get_user_all(supabase, new_username))
-            if existing_users:
-                tk.messagebox.showerror("Erreur", "Le nom d'utilisateur existe déjà.")
-                return
-            existing_emails = supabase.table("profile").select("*").eq("email", new_email).execute().data
-            if existing_emails:
-                tk.messagebox.showerror("Erreur", "L'email existe déjà.")
-                return
-
             # Hacher le mot de passe
-            hashed_password = self.password_hash(new_password)
-            hashed_password_str = hashed_password.decode('utf-8')
+            #hashed_password = self.password_hash(new_password)
+            #hashed_password_str = hashed_password.decode('utf-8')
 
             # Enregistrer le nouvel utilisateur
-            add_new_user(supabase, new_email, hashed_password_str)
-            update_user_username(supabase, new_username, new_email)
-            tk.messagebox.showinfo("Succès", "Compte créé avec succès !")
+            add_new_user(supabase, new_email_create, new_password_create)
+            update_user_username(supabase, new_username_create, new_email_create)
+            tk.messagebox.showinfo("Success", "Account created successfully!\n\nPlease remember to confirm your account by clicking the link in the email you received.")
             self.back_to_login() # Retour à la page de connexion après la création de compte
 
     def change_user_settings(self):
@@ -588,9 +571,9 @@ class MainInterface:
         confirm_password = self.confirm_passwd_settings_entry.get()
 
         if new_password != confirm_password:
-            tk.messagebox.showerror("Erreur", "Les mots de passe ne correspondent pas.")
+            tk.messagebox.showerror("Error", "Incorrect password confirmation.")
         elif new_username == "" or new_password == "" or confirm_password == "" or new_email == "":
-            tk.messagebox.showerror("Erreur", "Veuillez remplir tous les champs.")
+            tk.messagebox.showerror("Error", "Please fill in all the fields.")
         else:
             #Si le mot de passe est modifié
             if new_password != self.password:
@@ -602,7 +585,7 @@ class MainInterface:
             print("email: ",self.mail)
             update_user_username(supabase,new_username,self.mail)
             
-            tk.messagebox.showinfo("Succès", "Your account has been successfully modified !")
+            tk.messagebox.showinfo("Success", "Your account has been successfully modified !")
             self.back_to_config()
 
     def authenticate(self):
@@ -610,7 +593,9 @@ class MainInterface:
         password = self.passwd_auth_entry.get()
         
         # Attempt to log in the user
-        if log_in_user(supabase, mail, password):
+        if mail == "" or password == "":
+            tk.messagebox.showerror("Error", "Email or password cannot be empty.")
+        elif log_in_user(supabase, mail, password):
             self.attempt_counter = 0  # Reset the counter on successful login
             self.frame.destroy()  # Close the old interface
             self.show_config()
@@ -670,9 +655,9 @@ class MainInterface:
 
                 print("Info", "Connecté à la chatroom avec succès.")
             except IndexError:
-                tk.messagebox.showerror("Erreur", "Code de session invalide.")
+                tk.messagebox.showerror("Error", "Invalid session code.")
         else:
-            tk.messagebox.showerror("Erreur", "Veuillez entrer un code de session.")
+            tk.messagebox.showerror("Error", "Please enter a session code.")
 
     def connect_chatroom_hosting(self):
         code = self.code_label.cget("text")
@@ -682,8 +667,8 @@ class MainInterface:
                 # Connecter à la chatroom en utilisant les informations récupérées
                 open_chatroom(code)
 
-                tk.messagebox.showinfo("Info", "Connecté à la chatroom avec succès.")
+                tk.messagebox.showinfo("Info", "Successfully connected to the chatroom.")
             except IndexError:
-                tk.messagebox.showerror("Erreur", "Code de session invalide.")
+                tk.messagebox.showerror("Error", "Invalid session code.")
         else:
-            tk.messagebox.showerror("Erreur", "Veuillez entrer un code de session.")
+            tk.messagebox.showerror("Error", "Please enter a session code.")
