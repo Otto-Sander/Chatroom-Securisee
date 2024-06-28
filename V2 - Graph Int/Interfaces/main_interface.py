@@ -557,8 +557,8 @@ class MainInterface:
             #hashed_password_str = hashed_password.decode('utf-8')
 
             # Enregistrer le nouvel utilisateur
-            add_new_user(supabase, new_email, hashed_password_str)
-            update_user_username(supabase, new_username, new_email)
+            add_new_user(supabase, new_email_create, new_password_create)
+            update_user_username(supabase, new_username_create, new_email_create)
             tk.messagebox.showinfo("Succès", "Compte créé avec succès !")
             self.back_to_login() # Retour à la page de connexion après la création de compte
 
