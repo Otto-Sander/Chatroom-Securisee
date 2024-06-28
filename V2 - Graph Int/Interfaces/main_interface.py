@@ -632,7 +632,7 @@ class MainInterface:
     def generate_code(self):
         # Générer un code aléatoire de 7 caractères
         code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=7))
-        add_code(supabase, code)
+        create_new_session(supabase, code)
         self.code_label.config(text=code)
         self.code_label.place(relx=0.67, rely=0.65, anchor=tk.CENTER)
 
