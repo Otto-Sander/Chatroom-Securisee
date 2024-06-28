@@ -557,7 +557,8 @@ class MainInterface:
             #hashed_password_str = hashed_password.decode('utf-8')
 
             # Enregistrer le nouvel utilisateur
-            add_user(supabase, new_username, hashed_password_str, "mymail2")
+            add_new_user(supabase, new_email, hashed_password_str)
+            update_user_username(supabase, new_username, new_email)
             tk.messagebox.showinfo("Succès", "Compte créé avec succès !")
             self.back_to_login() # Retour à la page de connexion après la création de compte
 
@@ -613,7 +614,7 @@ class MainInterface:
     def generate_code(self):
         # Générer un code aléatoire de 7 caractères
         code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=7))
-        add_code(supabase, code)
+        create_new_session(supabase, code, None, None, None, None, None, None, None, None, None, None, None)
         self.code_label.config(text=code)
         self.code_label.place(relx=0.67, rely=0.65, anchor=tk.CENTER)
 
