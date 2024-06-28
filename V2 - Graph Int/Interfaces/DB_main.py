@@ -16,10 +16,8 @@ url = os.environ.get("SUPABASE_URL")
 key = os.environ.get("SUPABASE_KEY")
 supabase = create_client(url, key)
 
-
-email: str = "nathan.simoes@efrei.net"
-password: str = "rootrootroot"
-
+#email: str = "nathan.simoes@efrei.net"
+#password: str = "rootrootroot"
 
 #FONCTIONS DE TESTS
 #data = add_user(supabase, "Booo", "ROot", "nathan88@gmail.com")
@@ -43,14 +41,18 @@ password: str = "rootrootroot"
 
 #add_new_user(supabase, email, password, "Natha80")
 
+#data = supabase.auth.sign_in_with_password({"email": email, "password": password})
+
+#print("Logged In !!")
+
 #update_user_password(supabase, "rootroot")
 
-print("Current user id : ")
-print(get_current_connected_user_id(supabase))
+#print("Current user id : ")
+#print(get_current_connected_user_id(supabase))
 
-print("Current user mail : ")
-print(get_current_connected_user_email(supabase))
+#print("Current user mail : ")
+#print(get_current_connected_user_email(supabase))
 
-res = supabase.auth.sign_out()
+#res = supabase.auth.sign_out()
 
-print("Signed out ! ")
+#print("Signed out ! ")

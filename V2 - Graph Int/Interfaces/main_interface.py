@@ -562,11 +562,11 @@ class MainInterface:
         else:
             # Enregistrer le nouvel utilisateur (code à implémenter)
             # Par exemple, vous pouvez enregistrer les informations dans une base de données ou un fichier.
-            existing_users = get_user_all(supabase, new_username)
+            existing_users = (get_user_all(supabase, new_username))
             if existing_users:
                 tk.messagebox.showerror("Erreur", "Le nom d'utilisateur existe déjà.")
                 return
-            existing_emails = supabase.table("utilisateurs").select("*").eq("mail", new_email).execute().data
+            existing_emails = supabase.table("profile").select("*").eq("email", new_email).execute().data
             if existing_emails:
                 tk.messagebox.showerror("Erreur", "L'email existe déjà.")
                 return
@@ -576,7 +576,8 @@ class MainInterface:
             hashed_password_str = hashed_password.decode('utf-8')
 
             # Enregistrer le nouvel utilisateur
-            add_user(supabase, new_username, hashed_password_str, "mymail2")
+            add_new_user(supabase, new_email, hashed_password_str)
+            update_user_username(supabase, new_username, new_email)
             tk.messagebox.showinfo("Succès", "Compte créé avec succès !")
             self.back_to_login() # Retour à la page de connexion après la création de compte
 
@@ -632,7 +633,7 @@ class MainInterface:
     def generate_code(self):
         # Générer un code aléatoire de 7 caractères
         code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=7))
-        add_code(supabase, code)
+        create_new_session(supabase, code, None, None, None, None, None, None, None, None, None, None, None)
         self.code_label.config(text=code)
         self.code_label.place(relx=0.67, rely=0.65, anchor=tk.CENTER)
 
