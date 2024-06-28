@@ -8,39 +8,49 @@ def create_new_session(client, code, password, id_user1, id_user2, id_user3, id_
 
 # Fonction qui créé un server
 def create_new_server(client, ip, port):
-    data = client.table("server").insert({"IP": ip, "port": port}).execute()
+    data = client.table("serveur").insert({"IP": ip, "port": port}).execute()
 
 # Fonction qui créé une connexion (l'utilisateur doit être login)
 def create_new_connection(client, user_id, channel_code, ip, port):
-    data = client.table("connections").insert({"user_id": user_id, "channel_code": channel_code, "ip": ip, "port": port}).execute
+    try:
+        data = client.table("connections").insert({"user_id": user_id, "channel_code": channel_code, "ip": ip, "port": port}).execute()
+    except Exception as e:
+        print(f"Error in create_new_connection: {e}")
 
 
 ###############################
 # READ FUNCTIONS
 ###############################
 def get_last_server(client):
-    data = client.table("server").select("*").execute()
+    data = client.table("serveur").select("*").execute()
     return data.data[-1]["IP"], data.data[-1]["port"]
 
 # Fonction récupère toutes les infos d'un serv
 def get_server_all(client, id):
-    data = client.table("server").select("*").eq("id", id).execute()
+    data = client.table("serveur").select("*").eq("id", id).execute()
     return data.data
 
 # Fonction qui retourne l'IP d'un serv
 def get_server_IP(client, id):
-    data = client.table("server").select("IP").eq("id", id).execute()
+    data = client.table("serveur").select("IP").eq("id", id).execute()
     return data.data[0]["IP"]
 
 # Fonction qui retourne le port d'un serv
 def get_server_port(client, id):
-    data = client.table("server").select("port").eq("id", id).execute()
+    data = client.table("serveur").select("port").eq("id", id).execute()
     return data.data[0]["port"]
 
 # Fonction qui retourne toutes les infos d'une session
-def get_session_all(client, code):
-    data = client.table("session").select("*").eq("code", code).execute()
-    return data.data
+def get_session_all(client, session_code):
+    try:
+        response = client.table("session").select("*").eq("code", session_code).execute()
+        if response and response.data:
+            return response.data
+        else:
+            return []
+    except Exception as e:
+        print(f"Error in get_session_all: {e}")
+        return []
 
 # Fonction qui retourne l'id d'une session
 def get_session_id(client, code):
@@ -53,9 +63,22 @@ def get_session_password(client, code):
     return data.data[0]["password"]
 
 # Fonction qui retourne l'id des utilisateurs d'une session
-def get_session_users(client, code):
-    data = client.table("session").select("id_user1", "id_user2", "id_user3", "id_user4", "id_user5", "id_user6", "id_user7", "id_user8", "id_user9", "id_user10").eq("code", code).execute()
-    return data.data[0]
+def get_session_users(client, session_code):
+    try:
+        response = get_session_all(client, session_code)
+        if not response:
+            print("No session found with the provided session code.")
+            return []
+        users = []
+        session = response[0]
+        for col in ['id_user1', 'id_user2', 'id_user3', 'id_user4', 'id_user5', 'id_user6', 'id_user7', 'id_user8', 'id_user9', 'id_user10']:
+            user_id = session.get(col)
+            if user_id:
+                users.append(user_id)
+        return users
+    except Exception as e:
+        print(f"Error in get_session_users: {e}")
+        return []
 
 # Fonction qui retourne toutes les infos d'une connection
 def get_connection_all(client, user_id):
@@ -94,23 +117,30 @@ def update_session_new_user(client, next_column, new_user, code):
 
 # Fonction qui ajoute un nouvel utilisateur dans la session
 def add_next_user_in_session(client, session_code, new_user):
-    # Récupérer la ligne avec l'ID spécifié
-    response = get_session_all(client, session_code)
+    try:
+        # Récupérer la ligne avec l'ID spécifié
+        response = get_session_all(client, session_code)
 
-    session = response.data[0]
+        if not response:
+            print("No session found with the provided session code.")
+            return
 
-    # Déterminer la première colonne null
-    next_column = None
-    for col in ['id_user1', 'id_user2', 'id_user3', 'id_user4', 'id_user5', 'id_user6', 'id_user7', 'id_user8', 'id_user9', 'id_user10']:
-        if session[col] is None:
-            next_column = col
-            break
+        session = response[0]
 
-    if next_column is None:
-        print("All user columns are already filled.")
-    else:
-        # Mettre à jour la colonne avec le nouvel utilisateur
-        update_response = update_session_new_user(client, next_column, new_user, session_code)
+        # Déterminer la première colonne null
+        next_column = None
+        for col in ['id_user1', 'id_user2', 'id_user3', 'id_user4', 'id_user5', 'id_user6', 'id_user7', 'id_user8', 'id_user9', 'id_user10']:
+            if session.get(col) is None:
+                next_column = col
+                break
+
+        if next_column is None:
+            print("All user columns are already filled.")
+        else:
+            # Mettre à jour la colonne avec le nouvel utilisateur
+            update_session_new_user(client, next_column, new_user, session_code)
+    except Exception as e:
+        print(f"Error in add_next_user_in_session: {e}")
 
 
 ########################################
@@ -118,18 +148,22 @@ def add_next_user_in_session(client, session_code, new_user):
 ########################################
 
 # Fonction qui supprime un server
-def delete_server(client, id_serv):
-    data = client.table("serveur").delete().eq("id", id_serv).execute()
+def delete_server(client, ip):
+    data = client.table("serveur").delete().eq("IP", ip).execute()
 
 # Fonction qui supprime un utilisateur d'une session
 def delete_user_in_session(client, session_code, id_user):
     response = get_session_all(client, session_code)
 
-    session = response.data[0]
+    if not response:
+        print("No session found with the provided session code.")
+        return
+
+    session = response[0]  # Assumer que response est une liste
 
     column_to_find = None
     for col in ['id_user1', 'id_user2', 'id_user3', 'id_user4', 'id_user5', 'id_user6', 'id_user7', 'id_user8', 'id_user9', 'id_user10']:
-        if session[col] == id_user:
+        if session[col] == str(id_user):  # Convertir l'UUID en chaîne
             column_to_find = col
             break
 
@@ -137,7 +171,9 @@ def delete_user_in_session(client, session_code, id_user):
         print("User is not in session.")
     else:
         # Mettre à jour la colonne avec le nouvel utilisateur
-        data = client.table("session").update({column_to_find: None}).eq("code", session_code).execute()
+        client.from_("sessions").update({column_to_find: None}).eq("channel_code", session_code).execute()
+        print(f"User {id_user} removed from session {session_code}.")
+
 
 # Fonction qui supprime une session
 def delete_session(client, session_code):
