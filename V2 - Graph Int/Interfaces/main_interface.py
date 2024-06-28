@@ -513,7 +513,7 @@ class MainInterface:
     def save_user_modifications(self):
         self.user_data["username"] = self.username_var.get()
         self.user_data["passwd"] = self.email_var.get()
-        tk.messagebox.showinfo("Info", "Données sauvegardées avec succès!")
+        tk.messagebox.showinfo("Info", "Data saved successfully!")
         self.save_settings_button.config(state=tk.DISABLED)
 
     def on_change(self, *args):
@@ -546,13 +546,13 @@ class MainInterface:
         all_user_mail = get_user_all_mail(supabase)
 
         if new_password_create != confirm_password_create:
-            tk.messagebox.showerror("Erreur", "Les mots de passe ne correspondent pas.")
+            tk.messagebox.showerror("Error", "Incorrect password confirmation.")
         elif new_username_create == "" or new_password_create == "" or confirm_password_create == "":
-            tk.messagebox.showerror("Erreur", "Veuillez remplir tous les champs.")
+            tk.messagebox.showerror("Error", "Please fill in all the fields.")
         elif new_email_create in all_user_mail:
-            tk.messagebox.showerror("Erreur", "L'email existe déjà.")
+            tk.messagebox.showerror("Error", "The email already exist.")
         elif len(new_password_create) < 6:
-            tk.messagebox.showerror("Errueur", "Password must contains at least 6 characters")
+            tk.messagebox.showerror("Error", "Password must contains at least 6 characters")
         else:
             # Hacher le mot de passe
             #hashed_password = self.password_hash(new_password)
@@ -561,7 +561,7 @@ class MainInterface:
             # Enregistrer le nouvel utilisateur
             add_new_user(supabase, new_email_create, new_password_create)
             update_user_username(supabase, new_username_create, new_email_create)
-            tk.messagebox.showinfo("Succès", "Compte créé avec succès !")
+            tk.messagebox.showinfo("Success", "Account created successfully!\n\nPlease remember to confirm your account by clicking the link in the email you received.")
             self.back_to_login() # Retour à la page de connexion après la création de compte
 
     def change_user_settings(self):
@@ -571,9 +571,9 @@ class MainInterface:
         confirm_password = self.confirm_passwd_settings_entry.get()
 
         if new_password != confirm_password:
-            tk.messagebox.showerror("Erreur", "Les mots de passe ne correspondent pas.")
+            tk.messagebox.showerror("Error", "Incorrect password confirmation.")
         elif new_username == "" or new_password == "" or confirm_password == "" or new_email == "":
-            tk.messagebox.showerror("Erreur", "Veuillez remplir tous les champs.")
+            tk.messagebox.showerror("Error", "Please fill in all the fields.")
         else:
             #Si le mot de passe est modifié
             if new_password != self.password:
@@ -585,7 +585,7 @@ class MainInterface:
             print("email: ",self.mail)
             update_user_username(supabase,new_username,self.mail)
             
-            tk.messagebox.showinfo("Succès", "Your account has been successfully modified !")
+            tk.messagebox.showinfo("Success", "Your account has been successfully modified !")
             self.back_to_config()
 
     def authenticate(self):
@@ -593,7 +593,9 @@ class MainInterface:
         password = self.passwd_auth_entry.get()
         
         # Attempt to log in the user
-        if log_in_user(supabase, mail, password):
+        if mail == "" or password == "":
+            tk.messagebox.showerror("Error", "Email or password cannot be empty.")
+        elif log_in_user(supabase, mail, password):
             self.attempt_counter = 0  # Reset the counter on successful login
             self.frame.destroy()  # Close the old interface
             self.show_config()
@@ -653,9 +655,9 @@ class MainInterface:
 
                 print("Info", "Connecté à la chatroom avec succès.")
             except IndexError:
-                tk.messagebox.showerror("Erreur", "Code de session invalide.")
+                tk.messagebox.showerror("Error", "Invalid session code.")
         else:
-            tk.messagebox.showerror("Erreur", "Veuillez entrer un code de session.")
+            tk.messagebox.showerror("Error", "Please enter a session code.")
 
     def connect_chatroom_hosting(self):
         code = self.code_label.cget("text")
@@ -665,8 +667,8 @@ class MainInterface:
                 # Connecter à la chatroom en utilisant les informations récupérées
                 open_chatroom(code)
 
-                tk.messagebox.showinfo("Info", "Connecté à la chatroom avec succès.")
+                tk.messagebox.showinfo("Info", "Successfully connected to the chatroom.")
             except IndexError:
-                tk.messagebox.showerror("Erreur", "Code de session invalide.")
+                tk.messagebox.showerror("Error", "Invalid session code.")
         else:
-            tk.messagebox.showerror("Erreur", "Veuillez entrer un code de session.")
+            tk.messagebox.showerror("Error", "Please enter a session code.")
