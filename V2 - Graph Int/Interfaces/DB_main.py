@@ -46,10 +46,8 @@ password: str = "rootrootroot"
 #update_user_password(supabase, "rootroot")
 
 print("Current user id : ")
-print(get_current_connected_user_id(supabase))
 
 print("Current user mail : ")
-print(get_current_connected_user_email(supabase))
 
 res = supabase.auth.sign_out()
 

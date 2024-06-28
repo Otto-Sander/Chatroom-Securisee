@@ -9,6 +9,10 @@ def get_user_all(client, mail):
     print("data:",data)
     return data.data
 
+# Fonction qui retourne tous les mails de la table profil (user existant)
+def get_user_all_mail(client):
+    data = client.table("profile").select("email").execute()
+    return data.data
 
 #Fonction pour récupérer le mot de passe d'un utilisateur connecté
 def get_password(client, mail):
