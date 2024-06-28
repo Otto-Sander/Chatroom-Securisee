@@ -11,6 +11,7 @@ Fonctionnalités :
 - Affichage d'un message de bienvenue.
 - Formulaire de connexion avec nom d'utilisateur et mot de passe.
 - Options pour se connecter ou créer un nouveau compte.
+- Options pour modifier ses informations personnelles.
 - Connexion à une salle de chat sécurisée après l'authentification.
 """
 from DB_main import supabase
@@ -23,7 +24,6 @@ import tkinter as tk
 from PIL import ImageTk,Image
 import random
 import string
-import bcrypt
 import server
 import threading
 import sys
@@ -552,10 +552,6 @@ class MainInterface:
         elif new_email_create in all_user_mail:
             tk.messagebox.showerror("Erreur", "L'email existe déjà.")
         else:
-            # Hacher le mot de passe
-            #hashed_password = self.password_hash(new_password)
-            #hashed_password_str = hashed_password.decode('utf-8')
-
             # Enregistrer le nouvel utilisateur
             add_new_user(supabase, new_email_create, new_password_create)
             update_user_username(supabase, new_username_create, new_email_create)
@@ -603,13 +599,6 @@ class MainInterface:
             delay = 2 ** self.attempt_counter  # Exponential backoff
             tk.messagebox.showerror("Error", f"Incorrect username or password or confirm your mail. Please wait {delay} seconds before trying again.")
             time.sleep(delay)  # Wait for the calculated delay before allowing another attempt
-
-    def password_hash(self, password):
-        return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-
-    def check_password(self, password, hashed_password):
-        # Check hashed password. Using bcrypt, the salt is saved into the hash itself
-        return bcrypt.checkpw(password.encode('utf-8'), hashed_password)
     
     def generate_code(self):
         # Générer un code aléatoire de 7 caractères

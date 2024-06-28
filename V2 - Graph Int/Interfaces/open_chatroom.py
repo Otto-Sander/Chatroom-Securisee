@@ -11,9 +11,20 @@ from DB_CRUD_Users_Functions import *
 from Auth import *
 import socket
 
+client_socket = None
 def open_chatroom(previous_win,width_win,height_win,code):
 
     def on_close():
+        try:
+            # Send a "disconnect" message to the server
+            if client_socket:
+                client_socket.sendall(b"DISCONNECT")
+        except Exception as e:
+            print(f"Error sending disconnect message: {e}")
+
+            # Close the socket
+        if client_socket:
+            client_socket.close()
         root.destroy()
         previous_win.deiconify()
         previous_win.geometry(f"{width_win}x{height_win}")

@@ -3,8 +3,10 @@ import threading
 from DB_CRUD_Functions import *
 from DB_CRUD_Users_Functions import *
 from DB_main import supabase
+from Auth import *
 
 server_socket = None
+stop_event = threading.Event()
 
 def get_private_ip():
     try:
@@ -28,9 +30,12 @@ def find_free_port():
 def client_handler(id_user, client_socket, client_address, channel_code, lock):
     try:
         # Handle client messages within a specific channel
-        while True:
+        while not stop_event.is_set():
             message = client_socket.recv(1024)
             if message:
+                if message == "DISCONNECT":
+                    print(f"Client {client_address} in channel {channel_code} is disconnecting.")
+                    break
                 print(f"Message from {client_address} in channel {channel_code}: {message}")
                 with lock:
                     users = get_session_users(supabase, channel_code)
@@ -49,6 +54,9 @@ def client_handler(id_user, client_socket, client_address, channel_code, lock):
         with lock:
             delete_connection(supabase, id_user)
             delete_user_in_session(supabase, channel_code, id_user)
+            remaining_users = get_session_users(supabase, channel_code)
+            if not remaining_users:
+                delete_session(supabase, channel_code)
         client_socket.close()
 
 def send_message_to_user(ip, port, message):
@@ -83,13 +91,14 @@ def join_channel(client_socket, channel_code, id_user, lock):
 
         # Start client handler thread for this client and channel
         threading.Thread(target=client_handler,
-                         args=(id_user, client_socket, client_socket.getpeername(), channel_code, lock)).start()
-
+                         args=(
+                         id_user, client_socket, client_socket.getpeername(), channel_code, lock, stop_event)).start()
     except Exception as e:
         print(f"Error joining channel {channel_code}: {e}")
         client_socket.close()
 
 def start_server():
+    log_in_user(supabase, "nathan.simoes93@gmail.com","root1234")
     ip = get_private_ip()
     port = find_free_port()
 
@@ -120,6 +129,7 @@ def start_server():
     except Exception as e:
         print("Server error:", e)
     finally:
+        log_out_user(supabase)
         delete_server(supabase, ip)
         server_socket.close()
 
