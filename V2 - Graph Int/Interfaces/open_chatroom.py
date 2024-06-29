@@ -5,14 +5,30 @@ import datetime
 from PIL import ImageTk,Image
 import threading
 import os
-# from DB_main import supabase
-# from DB_CRUD_Functions import *
+from DB_main import supabase
+from DB_CRUD_Functions import *
+from DB_CRUD_Users_Functions import *
+from Auth import *
+import socket
 
+def get_last_server(client):
+    data = client.table("serveur").select("*").execute()
+    return data.data[-1]["IP"], data.data[-1]["port"]
 
+client_socket = None
 
-def open_chatroom(previous_win,width_win,height_win,code):
-
+def open_chatroom(previous_win,width_win,height_win,code,username):
     def on_close():
+        try:
+            # Send a "disconnect" message to the server
+            if client_socket:
+                client_socket.sendall(b"DISCONNECT")
+        except Exception as e:
+            print(f"Error sending disconnect message: {e}")
+
+            # Close the socket
+        if client_socket:
+            client_socket.close()
         root.destroy()
         previous_win.deiconify()
         previous_win.geometry(f"{width_win}x{height_win}")
@@ -22,6 +38,16 @@ def open_chatroom(previous_win,width_win,height_win,code):
         print("ok")
 
     previous_win.withdraw()
+
+    # ------------------------------------------- Connexion ----------------------------------------------------------
+
+    # ---------------------------------- Ajout du current id_user dans la session correspondante à la room
+    # Ajouter l'id user dans la table session :
+    id = get_id(supabase,username)
+    add_next_user_in_session(supabase,code,id) 
+
+    # ----------------------------------------------------------------------------------------------------------------
+
 
     root = ctk.CTk()
 
@@ -69,7 +95,7 @@ def open_chatroom(previous_win,width_win,height_win,code):
 
     upload_button = ctk.CTkButton(input_frame, text="Upload File", command= upload_file)
     upload_button.pack(side=tk.LEFT, padx=10, pady=5)
-
+    """
     try:
         print("Trying to connect to server...")
         ip, port = get_last_server(supabase)
@@ -78,9 +104,9 @@ def open_chatroom(previous_win,width_win,height_win,code):
         print("Socket created")
         client.connect((ip, port))
         print(f"Connected to server at {ip}:{port}")
-
         client.send(code.encode('utf-8'))
         print(f"Joined channel {code}")
+        client.send(get_current_connected_user_id(supabase).encode('utf-8'))
     except Exception as e:
         messagebox.showerror("Erreur", f"Impossible de se connecter au serveur : {e}")
         on_close()
@@ -133,7 +159,6 @@ def open_chatroom(previous_win,width_win,height_win,code):
     receive_thread = threading.Thread(target=receive_messages)
     receive_thread.daemon = True  # Permet au thread de se fermer lorsque la fenêtre principale est fermée
     receive_thread.start()
-
-    root.protocol("WM_DELETE_WINDOW", on_close())
+"""
+    root.protocol("WM_DELETE_WINDOW", on_close)
     root.mainloop()
-

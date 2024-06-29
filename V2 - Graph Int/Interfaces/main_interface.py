@@ -66,8 +66,8 @@ class MainInterface:
 # -----------------------------------------------------------------------------------------
         self.attempt_counter = 0
 
-        width_win= master.winfo_screenwidth() 
-        height_win= master.winfo_screenheight()
+        self.width_win= master.winfo_screenwidth() 
+        self.height_win= master.winfo_screenheight()
 
         self.supabase = supabase
         self.master = master
@@ -617,9 +617,9 @@ class MainInterface:
     
     def generate_code(self):
         # Générer un code aléatoire de 7 caractères
-        code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=7))
-        create_new_session(supabase, code, None, None, None, None, None, None, None, None, None, None, None)
-        self.code_label.config(text=code)
+        self.code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=7))
+        create_new_session(supabase, self.code, None, None, None, None, None, None, None, None, None, None, None)
+        self.code_label.config(text=self.code)
         self.code_label.place(relx=0.67, rely=0.65, anchor=tk.CENTER)
 
         # Supprimer le bouton existant
@@ -635,7 +635,7 @@ class MainInterface:
         copy_image = ImageTk.PhotoImage(copy_image)
 
 
-        self.button_copy_code = CTkButton(master=self.frame, image=copy_image, text='', corner_radius=5, fg_color="#040D15",hover_color=hover_button, width=20, font=('Lexend', 15, 'bold'),command=self.copy_to_clipboard(code))
+        self.button_copy_code = CTkButton(master=self.frame, image=copy_image, text='', corner_radius=5, fg_color="#040D15",hover_color=hover_button, width=20, font=('Lexend', 15, 'bold'),command=self.copy_to_clipboard(self.code))
         self.button_copy_code.place(relx=0.81, rely=0.65, anchor=tk.CENTER)
 
     def copy_to_clipboard(self, code):
@@ -665,7 +665,7 @@ class MainInterface:
         if code:
             try:
                 # Connecter à la chatroom en utilisant les informations récupérées
-                open_chatroom(code)
+                open_chatroom(self.master,self.width_win,self.height_win,self.code,get_username(supabase, self.mail))
 
                 tk.messagebox.showinfo("Info", "Successfully connected to the chatroom.")
             except IndexError:
