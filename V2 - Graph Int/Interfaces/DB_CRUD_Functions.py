@@ -44,10 +44,7 @@ def get_server_port(client, id):
 def get_session_all(client, session_code):
     try:
         response = client.table("session").select("*").eq("code", session_code).execute()
-        if response and response.data:
-            return response.data
-        else:
-            return []
+        return response.data
     except Exception as e:
         print(f"Error in get_session_all: {e}")
         return []
@@ -66,9 +63,6 @@ def get_session_password(client, code):
 def get_session_users(client, session_code):
     try:
         response = get_session_all(client, session_code)
-        if not response:
-            print("No session found with the provided session code.")
-            return []
         users = []
         session = response[0]
         for col in ['id_user1', 'id_user2', 'id_user3', 'id_user4', 'id_user5', 'id_user6', 'id_user7', 'id_user8', 'id_user9', 'id_user10']:
@@ -120,13 +114,7 @@ def add_next_user_in_session(client, session_code, new_user):
     try:
         # Récupérer la ligne avec l'ID spécifié
         response = get_session_all(client, session_code)
-
-        if not response:
-            print("No session found with the provided session code.")
-            return
-
         session = response[0]
-
         # Déterminer la première colonne null
         next_column = None
         for col in ['id_user1', 'id_user2', 'id_user3', 'id_user4', 'id_user5', 'id_user6', 'id_user7', 'id_user8', 'id_user9', 'id_user10']:
@@ -154,25 +142,18 @@ def delete_server(client, ip):
 # Fonction qui supprime un utilisateur d'une session
 def delete_user_in_session(client, session_code, id_user):
     response = get_session_all(client, session_code)
-
-    if not response:
-        print("No session found with the provided session code.")
-        return
-
     session = response[0]  # Assumer que response est une liste
-
     column_to_find = None
     for col in ['id_user1', 'id_user2', 'id_user3', 'id_user4', 'id_user5', 'id_user6', 'id_user7', 'id_user8', 'id_user9', 'id_user10']:
         if session[col] == str(id_user):  # Convertir l'UUID en chaîne
             column_to_find = col
             break
-
     if column_to_find is None:
         print("User is not in session.")
     else:
         # Mettre à jour la colonne avec le nouvel utilisateur
-        client.from_("sessions").update({column_to_find: None}).eq("channel_code", session_code).execute()
-        print(f"User {id_user} removed from session {session_code}.")
+        client.table("session").update({column_to_find: None}).eq("code", session_code).execute()
+
 
 
 # Fonction qui supprime une session
