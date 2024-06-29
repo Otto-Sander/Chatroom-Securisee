@@ -9,6 +9,7 @@ import uuid
 
 server_socket = None
 stop_event = threading.Event()
+clients = {}
 
 def get_private_ip():
     try:
@@ -31,6 +32,7 @@ def find_free_port():
 
 def client_handler(id_user, client_socket, client_address, channel_code, lock):
     id_user_uuid = uuid.UUID(id_user)
+    clients[client_address] = client_socket
     try:
         while not stop_event.is_set():
             message = client_socket.recv(1024)
@@ -44,12 +46,19 @@ def client_handler(id_user, client_socket, client_address, channel_code, lock):
                     print(users)
                     for receiver_id in users:
                         if receiver_id != id_user:
-                            receiver_id_uuid = uuid.UUID(receiver_id)
-                            print(f"Sending message to user {receiver_id}.")
-                            ip = get_connection_ip(supabase, receiver_id_uuid)
-                            port = get_connection_port(supabase, receiver_id_uuid)
-                            print (f"IP: {ip}, Port: {port}")
-                            send_message_to_user(ip, port, message)
+                            receiver_info = get_connection_all(supabase, receiver_id)
+                            print(receiver_info)
+                            for connection_info in receiver_info:
+                                receiver_address = (connection_info['ip'], connection_info['port'])
+                                receiver_socket = clients.get(receiver_address)
+                            if receiver_socket:
+                                try:
+                                    receiver_socket.send(message)
+                                    print(f"Message sent to user {receiver_id}")
+                                except Exception as e:
+                                    print(f"Error sending message to user {receiver_id}: {e}")
+                            else:
+                                print(f"User {receiver_id} socket not found.")
             else:
                 break
     except Exception as e:
@@ -57,29 +66,11 @@ def client_handler(id_user, client_socket, client_address, channel_code, lock):
     finally:
         with lock:
             delete_connection(supabase, id_user_uuid)
-            delete_user_in_session(supabase, channel_code, id_user_uuid)
+            delete_user_in_session(supabase, channel_code, id_user)
             remaining_users = get_session_users(supabase, channel_code)
             if not remaining_users:
                 delete_session(supabase, channel_code)
         client_socket.close()
-
-def send_message_to_user(ip, port, message):
-    try:
-        # Create a TCP socket
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        # Connect to the user's IP and port
-        sock.connect((ip, port))
-        # Send the message
-        if isinstance(message, str):
-            sock.send(message.encode('utf-8'))  # Encode the message to bytes if it's a string
-        else:
-            sock.send(message)  # Directly send if it's already bytes
-        # Close the socket
-        sock.close()
-        print(f"Message sent to {ip}:{port}: {message}")
-
-    except Exception as e:
-        print(f"Error sending message to {ip}:{port}: {e}")
 
 
 def join_channel(client_socket,client_address, channel_code, id_user, lock):
