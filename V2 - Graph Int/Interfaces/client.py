@@ -42,6 +42,9 @@ def enter_server(ip, port):
     send_thread = threading.Thread(target=send)
     send_thread.start()
 
+
+########################################## NEW FUNCTIONS #################################################
+
     def send_file():
         try:
             file_path = input("Entrez le chemin complet du fichier à envoyer: ")
@@ -92,6 +95,6 @@ def enter_server(ip, port):
             file.write(decoded_file_data)
 
         print("Transfert de fichier terminé.")
-
+##############################################################################################################
 if __name__ == "__main__":
     enter_server('127.0.0.1', 12345)

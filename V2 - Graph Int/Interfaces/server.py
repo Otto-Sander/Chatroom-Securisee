@@ -99,6 +99,7 @@ def start_server():
         delete_server(supabase, ip)
         server_socket.close()
 
+#################################### NEW FUNCTIONS ##########################################################
 
     def send_file(self, file_name, file_size, file_data):
         try:
@@ -143,6 +144,8 @@ def start_server():
             for connection in self.connections:
                 if connection.address != source:
                     connection.send_file(file_name, file_size, file_data)
+
+###############################################################################################################
 
 if __name__ == "__main__":
     start_server()
