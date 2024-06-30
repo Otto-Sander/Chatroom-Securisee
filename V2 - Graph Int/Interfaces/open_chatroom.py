@@ -10,7 +10,7 @@ from Auth import *
 
 client_socket = None
 
-def open_chatroom(previous_win, width_win, height_win, code):
+def open_chatroom(previous_win, width_win, height_win, code, username):
 
     def on_close():
         try:
