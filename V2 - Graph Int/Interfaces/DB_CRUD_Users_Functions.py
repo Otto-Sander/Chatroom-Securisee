@@ -27,8 +27,8 @@ def get_username(client, mail):
 
 
 # Fonction pour récupérer l'id d'un utilisateur
-def get_id(client, username):
-    data = client.table("profile").select("id").eq("username", username).execute()
+def get_id(client, mail):
+    data = client.table("profile").select("id").eq("mail", mail).execute()
     return data.data[0]["id"]
 
 #############################

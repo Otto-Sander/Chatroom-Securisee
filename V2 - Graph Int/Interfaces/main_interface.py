@@ -114,7 +114,7 @@ class MainInterface:
 
     #Connection panel : LOGIN PANEL --------------------------------------------------------------------------------------
     def show_authentication(self):
-
+        
         # Détruit l'ancienne fenêtre
         self.frame.destroy()
 
@@ -664,10 +664,9 @@ class MainInterface:
 
         if code:
             try:
-                # Connecter à la chatroom en utilisant les informations récupérées
-                open_chatroom(self.master,self.width_win,self.height_win,self.code,get_username(supabase, self.mail))
-
                 tk.messagebox.showinfo("Info", "Successfully connected to the chatroom.")
+                # Connecter à la chatroom en utilisant les informations récupérées
+                open_chatroom(self.master,self.width_win,self.height_win,self.code)
             except IndexError:
                 tk.messagebox.showerror("Error", "Invalid session code.")
         else:

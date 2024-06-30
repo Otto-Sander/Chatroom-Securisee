@@ -15,5 +15,7 @@ def is_session_in_database(client, code):
     data = get_session_all(client, code)
     if(data == []):
         print("This session is not in the dataBase !  :(")
+        return False
     else:
         print("This session is in the dataBase !  :)")
+        return True
