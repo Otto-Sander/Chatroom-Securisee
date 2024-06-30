@@ -4,6 +4,7 @@ from DB_CRUD_Functions import *
 from DB_main import supabase
 from crypto_utils import *
 from rsa import *
+import os
 
 lock = threading.Lock()
 server_socket = None
@@ -97,6 +98,51 @@ def start_server():
     finally:
         delete_server(supabase, ip)
         server_socket.close()
+
+
+    def send_file(self, file_name, file_size, file_data):
+        try:
+            self.socket.sendall("FILE".encode())
+            self.socket.sendall(f"{file_name:<100}".encode('utf-8'))
+            self.socket.sendall(f"{file_size:<100}".encode('utf-8'))
+            self.socket.sendall(file_data)
+            print(f"File {file_name} sent to {self.address}")
+        except Exception as e:
+            print("Send file error:", e)
+
+
+    def receive_file(self):
+        if not os.path.exists("temp"):
+            os.makedirs("temp")
+
+        file_name = self.socket.recv(100).decode().strip()
+        file_size = int(self.socket.recv(100).decode().strip())
+        print(f"Receiving file: {file_name}, Size: {file_size}")
+
+        encoded_file_data = b""
+        while len(encoded_file_data) < file_size:
+            data = self.socket.recv(1024)
+            if not data:
+                break
+            encoded_file_data += data
+
+        # Déchiffrement du fichier
+        decrypted_file_data = aes_decrypt(base64.b64decode(encoded_file_data).decode('utf-8'), self.server.aes_key)
+        decoded_file_data = base64.b64decode(decrypted_file_data.encode('utf-8'))
+
+        with open(os.path.join("temp", file_name), "wb") as file:
+            file.write(decoded_file_data)
+
+        print(f"File {file_name} transfer complete.")
+
+        # Broadcast the file to other clients
+        self.server.broadcast_file(file_name, file_size, encoded_file_data, self.address)
+
+    def broadcast_file(self, file_name, file_size, file_data, source):
+        with self.lock:
+            for connection in self.connections:
+                if connection.address != source:
+                    connection.send_file(file_name, file_size, file_data)
 
 if __name__ == "__main__":
     start_server()
