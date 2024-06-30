@@ -33,6 +33,7 @@ import time
 from DB_Additional_Functions import *
 from DB_CRUD_Functions import *
 from DB_CRUD_Users_Functions import *
+from crypto_utils import *
 # ----------------------------
 
 # ------------------------ COLOR DESIGN ----------------------------------
@@ -605,6 +606,7 @@ class MainInterface:
             time.sleep(delay)  # Wait for the calculated delay before allowing another attempt
     
     def generate_code(self):
+
         # Générer un code aléatoire de 7 caractères
         self.code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=7))
         create_new_session(supabase, self.code, None, None, None, None, None, None, None, None, None, None, None)
@@ -640,7 +642,7 @@ class MainInterface:
         if code:
             try:
                 # Connecter à la chatroom en utilisant les informations récupérées
-                open_chatroom(self.master, self.width_win, self.height_win,code)
+                open_chatroom(self.master, self.width_win, self.height_win,code,get_username(supabase, self.mail))
 
                 print("Info", "Connecté à la chatroom avec succès.")
             except IndexError:

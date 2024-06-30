@@ -6,6 +6,13 @@ from DB_CRUD_Users_Functions import *
 from DB_main import supabase
 from Auth import *
 import uuid
+import os
+from rsa import rsa_encrypt
+from rsa import generate_rsa_keys
+from Crypto.Cipher import AES
+from Crypto.Random import get_random_bytes
+import base64
+from crypto_utils import *
 
 server_socket = None
 stop_event = threading.Event()
@@ -30,11 +37,19 @@ def find_free_port():
     s.close()
     return port
 
-def client_handler(id_user, client_socket, client_address, channel_code, lock):
+def generate_aes_key():
+    return AES.get_random_bytes(32)  # AES key generation (256 bits)
+
+def client_handler(id_user, client_socket, client_address, channel_code, lock,public_key):
     id_user_uuid = uuid.UUID(id_user)
     clients[client_address] = client_socket
     try:
         while not stop_event.is_set():
+            aes_key = generate_aes_key()
+            encrypted_aes_key = rsa_encrypt(aes_key, public_key)
+            client_socket.send(base64.b64encode(encrypted_aes_key))
+
+
             message = client_socket.recv(1024)
             if message:
                 if message == b"DISCONNECT":
@@ -73,7 +88,7 @@ def client_handler(id_user, client_socket, client_address, channel_code, lock):
         client_socket.close()
 
 
-def join_channel(client_socket,client_address, channel_code, id_user, lock):
+def join_channel(client_socket,client_address, channel_code, id_user, lock, public_key):
     try:
         session_exist = is_session_in_database(supabase, channel_code)
         if session_exist :
@@ -89,7 +104,7 @@ def join_channel(client_socket,client_address, channel_code, id_user, lock):
         # Start client handler thread for this client and channel
         threading.Thread(target=client_handler,
                          args=(
-                         id_user, client_socket, client_socket.getpeername(), channel_code, lock)).start()
+                         id_user, client_socket, client_socket.getpeername(), channel_code, lock,public_key)).start()
     except Exception as e:
         print(f"Error joining channel {channel_code}: {e}")
         client_socket.close()
@@ -116,6 +131,9 @@ def start_server():
             client_socket, client_address = server_socket.accept()
             print(f"Accepted a new connection from {client_address}")
 
+            
+            rsa_keys = generate_rsa_keys()
+
             # Receive the channel code from the client
             channel_code = client_socket.recv(1024).decode('utf-8')
             print("Received channel code:", channel_code)
@@ -133,6 +151,50 @@ def start_server():
         log_out_user(supabase)
         delete_server(supabase, ip)
         server_socket.close()
+# ------------------------------------------------------------------
+    def send_file(self, file_name, file_size, file_data):
+        try:
+            self.socket.sendall("FILE".encode())
+            self.socket.sendall(f"{file_name:<100}".encode('utf-8'))
+            self.socket.sendall(f"{file_size:<100}".encode('utf-8'))
+            self.socket.sendall(file_data)
+            print(f"File {file_name} sent to {self.address}")
+        except Exception as e:
+            print("Send file error:", e)
+
+
+    def receive_file(self):
+        if not os.path.exists("temp"):
+            os.makedirs("temp")
+
+        file_name = self.socket.recv(100).decode().strip()
+        file_size = int(self.socket.recv(100).decode().strip())
+        print(f"Receiving file: {file_name}, Size: {file_size}")
+
+        encoded_file_data = b""
+        while len(encoded_file_data) < file_size:
+            data = self.socket.recv(1024)
+            if not data:
+                break
+            encoded_file_data += data
+
+        # Déchiffrement du fichier
+        decrypted_file_data = aes_decrypt(base64.b64decode(encoded_file_data).decode('utf-8'), self.server.aes_key)
+        decoded_file_data = base64.b64decode(decrypted_file_data.encode('utf-8'))
+
+        with open(os.path.join("temp", file_name), "wb") as file:
+            file.write(decoded_file_data)
+
+        print(f"File {file_name} transfer complete.")
+
+        # Broadcast the file to other clients
+        self.server.broadcast_file(file_name, file_size, encoded_file_data, self.address)
+
+    def broadcast_file(self, file_name, file_size, file_data, source):
+        with self.lock:
+            for connection in self.connections:
+                if connection.address != source:
+                    connection.send_file(file_name, file_size, file_data)
 
 if __name__ == "__main__":
     start_server()
