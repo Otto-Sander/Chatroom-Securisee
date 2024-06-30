@@ -11,6 +11,7 @@ Fonctionnalités :
 - Affichage d'un message de bienvenue.
 - Formulaire de connexion avec nom d'utilisateur et mot de passe.
 - Options pour se connecter ou créer un nouveau compte.
+- Options pour modifier ses informations personnelles.
 - Connexion à une salle de chat sécurisée après l'authentification.
 """
 from DB_main import supabase
@@ -23,7 +24,6 @@ import tkinter as tk
 from PIL import ImageTk,Image
 import random
 import string
-import bcrypt
 import server
 import threading
 import sys
@@ -66,7 +66,7 @@ class MainInterface:
 # -----------------------------------------------------------------------------------------
         self.attempt_counter = 0
 
-        self.width_win= master.winfo_screenwidth() 
+        self.width_win= master.winfo_screenwidth()
         self.height_win= master.winfo_screenheight()
 
         self.supabase = supabase
@@ -88,7 +88,7 @@ class MainInterface:
         self.heading_2.place(relx=0.067, rely=0.225, width=500, height=50)
 
         # Left Image ----------------------------------------
-        image_path = "Images\logo.jpg"
+        image_path = "Images/logo.jpg"
         image = Image.open(image_path)
         image = image.resize((310,230))
         image = ImageTk.PhotoImage(image)
@@ -102,7 +102,7 @@ class MainInterface:
         self.heading_3.place(relx=0.45, rely=0.32, width=400, height=200)
 
         # BOUTON-------------------------------------------
-        button = Image.open("Images\logo_next.png")
+        button = Image.open("Images/logo_next.png")
         resized_image = button.resize((70, 70))
         # Convertir l'image redimensionnée en format ImageTk.PhotoImage
         image = ImageTk.PhotoImage(resized_image)
@@ -164,7 +164,7 @@ class MainInterface:
         self.frame.after(0, update, 0)
 
         # Left Image ----------------------------------------------
-        image_path = "Images\login_interface.png"
+        image_path = "Images/login_interface.png"
         image = Image.open(image_path)
         image = image.resize((260,260))
         image = ImageTk.PhotoImage(image)
@@ -348,7 +348,7 @@ class MainInterface:
         button_create_user.place(x=500,y=475)
 
         # BOUTON-------------------------------------------
-        button = Image.open("Images\logo_next_before.png")
+        button = Image.open("Images/logo_next_before.png")
         resized_image = button.resize((60, 60))
         # Convertir l'image redimensionnée en format ImageTk.PhotoImage
         image = ImageTk.PhotoImage(resized_image)
@@ -440,7 +440,7 @@ class MainInterface:
         self.title_label.place(relx=0.31, rely=0.13, anchor=tk.CENTER)
 
         # Logo Start-Up
-        image_path = "Images\logo.jpg"
+        image_path = "Images/logo.jpg"
         image = Image.open(image_path)
         image = image.resize((50,50))
         image = ImageTk.PhotoImage(image)
@@ -554,10 +554,6 @@ class MainInterface:
         elif len(new_password_create) < 6:
             tk.messagebox.showerror("Error", "Password must contains at least 6 characters")
         else:
-            # Hacher le mot de passe
-            #hashed_password = self.password_hash(new_password)
-            #hashed_password_str = hashed_password.decode('utf-8')
-
             # Enregistrer le nouvel utilisateur
             add_new_user(supabase, new_email_create, new_password_create)
             update_user_username(supabase, new_username_create, new_email_create)
@@ -607,13 +603,6 @@ class MainInterface:
             delay = 2 ** self.attempt_counter  # Exponential backoff
             tk.messagebox.showerror("Error", f"Incorrect username or password or confirm your mail. Please wait {delay} seconds before trying again.")
             time.sleep(delay)  # Wait for the calculated delay before allowing another attempt
-
-    def password_hash(self, password):
-        return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-
-    def check_password(self, password, hashed_password):
-        # Check hashed password. Using bcrypt, the salt is saved into the hash itself
-        return bcrypt.checkpw(password.encode('utf-8'), hashed_password)
     
     def generate_code(self):
         # Générer un code aléatoire de 7 caractères
@@ -651,7 +640,7 @@ class MainInterface:
         if code:
             try:
                 # Connecter à la chatroom en utilisant les informations récupérées
-                open_chatroom(code)
+                open_chatroom(self.master, self.width_win, self.height_win,code)
 
                 print("Info", "Connecté à la chatroom avec succès.")
             except IndexError:

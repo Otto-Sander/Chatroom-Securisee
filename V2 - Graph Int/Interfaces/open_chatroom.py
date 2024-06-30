@@ -57,7 +57,6 @@ def open_chatroom(previous_win, width_win, height_win, code):
     input_frame = tk.Frame(root)
     input_frame.pack(padx=10, pady=5, fill=tk.X)
 
-
     message_entry = ctk.CTkEntry(input_frame, placeholder_text="Écrire un message...")
     message_entry.pack(side=tk.LEFT, padx=10, pady=5, fill=tk.X, expand=True)
 

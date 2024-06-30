@@ -168,13 +168,12 @@ def delete_user_in_session(client, session_code, id_user):
         if session[col] == str(id_user):  # Convertir l'UUID en chaîne
             column_to_find = col
             break
-    print(column_to_find)
     if column_to_find is None:
         print("User is not in session.")
     else:
         # Mettre à jour la colonne avec le nouvel utilisateur
-        client.from_("session").update({column_to_find: None}).eq("code", session_code).execute()
-        print(f"User {id_user} removed from session {session_code}.")
+        client.table("session").update({column_to_find: None}).eq("code", session_code).execute()
+
 
 
 # Fonction qui supprime une session

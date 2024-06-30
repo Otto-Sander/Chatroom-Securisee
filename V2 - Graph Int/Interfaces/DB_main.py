@@ -16,15 +16,6 @@ url = os.environ.get("SUPABASE_URL")
 key = os.environ.get("SUPABASE_KEY")
 supabase = create_client(url, key)
 
-password = "rootroot"
-log_in_user(supabase,"nathan.simoes93@gmail.com",password)
-
-data = get_session_users(supabase,"3H1C1B1")
-print("data:",data)
-
-delete_user_in_session(supabase,"3H1C1B1","17bf4bfd-3900-4da4-b90b-d10d483c33ea")
-
-
 
 #email: str = "nathan.simoes@efrei.net"
 #password: str = "rootrootroot"
