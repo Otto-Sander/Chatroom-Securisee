@@ -7,6 +7,8 @@ import socket
 from DB_main import supabase
 from DB_CRUD_Functions import *
 from Auth import *
+from rsa import *
+from crypto_utils import *
 
 client_socket = None
 
@@ -66,13 +68,23 @@ def open_chatroom(previous_win, width_win, height_win, code):
         ip, port = get_last_server(supabase)
         user_id = get_current_connected_user_id(supabase)
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        private_key, public_key = generate_rsa_keys()
         client_socket.connect((ip, port))
         client_socket.send(code.encode('utf-8'))
         response = client_socket.recv(1024).decode('utf-8')
+        print(response)
+
+        client_socket.send(public_key)
+        response = client_socket.recv(1024).decode('utf-8')
+        print(response)
 
         user_id_str = str(user_id)
         client_socket.send(user_id_str.encode('utf-8'))
         response = client_socket.recv(1024).decode('utf-8')
+        print(response)
+
+        encrypted_aes_key = client_socket.recv(1024)
+        aes_key = rsa_decrypt(encrypted_aes_key, private_key)
 
     except Exception as e:
         messagebox.showerror("Erreur", f"Impossible de se connecter au serveur : {e}")
@@ -83,7 +95,8 @@ def open_chatroom(previous_win, width_win, height_win, code):
         message = message_entry.get()
         if message:
             try:
-                client.send(message.encode('utf-8'))
+                encrypted_message = aes_encrypt(message, aes_key)
+                client.send(encrypted_message.encode('utf-8'))
                 display_message(chat_box, "Moi", message)
                 message_entry.delete(0, tk.END)
             except Exception as e:
@@ -114,8 +127,9 @@ def open_chatroom(previous_win, width_win, height_win, code):
         while True:
             try:
                 message = client_socket.recv(1024).decode('utf-8')
+                decrypted_message = aes_decrypt(message, aes_key)
                 if message and message != "Channel joined successfully.":
-                    display_message(chat_box, "Autre", message)
+                    display_message(chat_box, "Autre", decrypted_message)
             except Exception as e:
                 print("Erreur de réception des messages:", e)
                 break

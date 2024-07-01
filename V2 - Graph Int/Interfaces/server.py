@@ -6,6 +6,8 @@ from DB_CRUD_Users_Functions import *
 from DB_main import supabase
 from Auth import *
 import uuid
+from rsa import *
+from crypto_utils import *
 
 server_socket = None
 stop_event = threading.Event()
@@ -30,10 +32,12 @@ def find_free_port():
     s.close()
     return port
 
-def client_handler(id_user, client_socket, client_address, channel_code, lock):
+def client_handler(id_user, client_socket, client_address, channel_code, lock, aes_key, public_key):
     id_user_uuid = uuid.UUID(id_user)
     clients[client_address] = client_socket
     try:
+        encrypted_aes_key = rsa_encrypt(aes_key, public_key)
+        client_socket.send(base64.b64encode(encrypted_aes_key))
         while not stop_event.is_set():
             message = client_socket.recv(1024)
             if message:
@@ -73,7 +77,7 @@ def client_handler(id_user, client_socket, client_address, channel_code, lock):
         client_socket.close()
 
 
-def join_channel(client_socket,client_address, channel_code, id_user, lock):
+def join_channel(client_socket,client_address, channel_code, id_user, lock,aes_key, public_key):
     try:
         session_exist = is_session_in_database(supabase, channel_code)
         if session_exist :
@@ -89,7 +93,7 @@ def join_channel(client_socket,client_address, channel_code, id_user, lock):
         # Start client handler thread for this client and channel
         threading.Thread(target=client_handler,
                          args=(
-                         id_user, client_socket, client_socket.getpeername(), channel_code, lock)).start()
+                         id_user, client_socket, client_socket.getpeername(), channel_code, lock,aes_key, public_key)).start()
     except Exception as e:
         print(f"Error joining channel {channel_code}: {e}")
         client_socket.close()
@@ -107,6 +111,7 @@ def start_server():
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     server_socket.bind((ip, port))
     create_new_server(supabase, ip, port)
+    aes_key = generate_aes_key()
 
     server_socket.listen(5)
     print("Server listening on", server_socket.getsockname(), "...")
@@ -121,11 +126,14 @@ def start_server():
             print("Received channel code:", channel_code)
             client_socket.send(b"Channel code received.")
 
+            public_key = client_socket.recv(1024).decode('utf-8')
+            client_socket.send(b"Public key received.")
+
             id_user = client_socket.recv(1024).decode('utf-8')
             print("Received user ID:", id_user)
             client_socket.send(b"User ID received.")
-            print(f"User ID: {id_user}")
-            join_channel(client_socket, client_address, channel_code, id_user, lock)
+
+            join_channel(client_socket, client_address, channel_code, id_user, lock, aes_key, public_key)
 
     except Exception as e:
         print("Server error:", e)
