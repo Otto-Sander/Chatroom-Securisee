@@ -7,10 +7,12 @@ import socket
 from DB_main import supabase
 from DB_CRUD_Functions import *
 from Auth import *
+import os
+import time
 
 client_socket = None
 
-def open_chatroom(previous_win, width_win, height_win, code):
+def open_chatroom(previous_win, width_win, height_win, code, username):
 
     def on_close():
         try:
@@ -127,10 +129,48 @@ def open_chatroom(previous_win, width_win, height_win, code):
     def upload_file():
         file_path = filedialog.askopenfilename()
         if file_path:
+            file_size = os.path.getsize(file_path)
+            with open(file_path,"rb") as file:
+                # Starting the time capture
+                start_time = time.time()
+                file_data = file.read()
+
+                # Chiffrement du fichier ----------------------------------------
+
+                # ---------------------------------------------------------------
+                client_socket.sendall("FILE".encode())
+                client_socket.sendall(f"{os.path.basename(file_path):<100}".encode('utf-8'))
+                client_socket.sendall(f"{len(file_data):<100}".encode('utf-8'))
+
             display_message(chat_box, "Moi", f"File uploaded: {file_path}")
+
 
     upload_button = ctk.CTkButton(input_frame, text="Upload File", command=upload_file)
     upload_button.pack(side=tk.LEFT, padx=10, pady=5)
 
     root.protocol("WM_DELETE_WINDOW", on_close)
     root.mainloop()
+
+    # FILE 
+    def receive_file():
+        if not os.path.exists("temp"):
+            os.makedirs("temp")
+
+        file_name = client_socket.recv(100).decode().strip()
+        file_size = int(client_socket.recv(100).decode().strip())
+
+        encoded_file_data = b""
+        while len(encoded_file_data) < file_size:
+            data = client_socket.recv(1024)
+            if not data:
+                break
+            encoded_file_data += data
+
+        # Déchiffrement du fichier -----------------------------------------------
+
+        #-------------------------------------------------------------------------
+
+        with open(os.path.join("temp", file_name), "wb") as file:
+            file.write(encoded_file_data)
+
+        print("Transfert de fichier terminé.")

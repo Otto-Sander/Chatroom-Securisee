@@ -6,9 +6,20 @@ from DB_CRUD_Users_Functions import *
 from DB_main import supabase
 from Auth import *
 import uuid
+import os
+from rsa import rsa_encrypt
+from rsa import generate_rsa_keys
+from Crypto.Cipher import AES
+from Crypto.Random import get_random_bytes
+import base64
+from crypto_utils import *
 
 server_socket = None
 stop_event = threading.Event()
+clients = {}
+
+session_aes ={}
+
 
 def get_private_ip():
     try:
@@ -29,27 +40,82 @@ def find_free_port():
     s.close()
     return port
 
-def client_handler(id_user, client_socket, client_address, channel_code, lock):
+def generate_aes_key():
+    return AES.get_random_bytes(32)  # AES key generation (256 bits)
+
+def send_file(self, file_name, file_size, file_data):
+        try:
+            server_socket.sendall("FILE".encode())
+            server_socket.sendall(f"{file_name:<100}".encode('utf-8'))
+            server_socket.sendall(f"{file_size:<100}".encode('utf-8'))
+            server_socket.sendall(file_data)
+            print(f"File {file_name} sent to {self.address}")
+        except Exception as e:
+            print("Send file error:", e)
+
+def broadcast_file(self, file_name, file_size, file_data, source):
+        with self.lock:
+            for connection in self.connections:
+                if connection.address != source:
+                    connection.send_file(file_name, file_size, file_data)
+
+def receive_file(client_socket, client_address):
+        if not os.path.exists("temp"):
+            os.makedirs("temp")
+
+        file_name = client_socket.recv(100).decode().strip()
+        file_size = int(client_socket.recv(100).decode().strip())
+        print(f"Receiving file: {file_name}, Size: {file_size}")
+
+        received_file_data = b""
+        while len(received_file_data) < file_size:
+            data = client_socket.recv(1024)
+            if not data:
+                break
+            received_file_data += data
+
+        with open(os.path.join("temp", file_name), "wb") as file:
+            file.write(received_file_data)
+
+        print(f"File {file_name} transfer complete.")
+        broadcast_file(file_name, file_size, received_file_data, client_address)
+
+def client_handler(id_user, client_socket, client_address, channel_code, lock,self):
     id_user_uuid = uuid.UUID(id_user)
+    clients[client_address] = client_socket
     try:
         while not stop_event.is_set():
+
             message = client_socket.recv(1024)
+
             if message:
                 if message == b"DISCONNECT":
                     print(f"Client {client_address} in channel {channel_code} is disconnecting.")
                     break
                 print(f"Message from {client_address} in channel {channel_code}: {message}")
+
                 with lock:
                     users = get_session_users(supabase, channel_code)
                     print(users)
                     for receiver_id in users:
                         if receiver_id != id_user:
-                            receiver_id_uuid = uuid.UUID(receiver_id)
-                            print(f"Sending message to user {receiver_id}.")
-                            ip = get_connection_ip(supabase, receiver_id_uuid)
-                            port = get_connection_port(supabase, receiver_id_uuid)
-                            print (f"IP: {ip}, Port: {port}")
-                            send_message_to_user(ip, port, message)
+                            receiver_info = get_connection_all(supabase, receiver_id)
+                            print(receiver_info)
+                            for connection_info in receiver_info:
+                                receiver_address = (connection_info['ip'], connection_info['port'])
+                                receiver_socket = clients.get(receiver_address)
+                            if receiver_socket:
+                                try:
+                                    if message == "FILE":
+                                        receive_file()
+                                        print(f"File sent to user {receiver_id}")
+                                    else:
+                                        receiver_socket.send(message)
+                                        print(f"Message sent to user {receiver_id}")
+                                except Exception as e:
+                                    print(f"Error sending message to user {receiver_id}: {e}")
+                            else:
+                                print(f"User {receiver_id} socket not found.")
             else:
                 break
     except Exception as e:
@@ -57,32 +123,14 @@ def client_handler(id_user, client_socket, client_address, channel_code, lock):
     finally:
         with lock:
             delete_connection(supabase, id_user_uuid)
-            delete_user_in_session(supabase, channel_code, id_user_uuid)
+            delete_user_in_session(supabase, channel_code, id_user)
             remaining_users = get_session_users(supabase, channel_code)
             if not remaining_users:
                 delete_session(supabase, channel_code)
         client_socket.close()
 
-def send_message_to_user(ip, port, message):
-    try:
-        # Create a TCP socket
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        # Connect to the user's IP and port
-        sock.connect((ip, port))
-        # Send the message
-        if isinstance(message, str):
-            sock.send(message.encode('utf-8'))  # Encode the message to bytes if it's a string
-        else:
-            sock.send(message)  # Directly send if it's already bytes
-        # Close the socket
-        sock.close()
-        print(f"Message sent to {ip}:{port}: {message}")
 
-    except Exception as e:
-        print(f"Error sending message to {ip}:{port}: {e}")
-
-
-def join_channel(client_socket,client_address, channel_code, id_user, lock):
+def join_channel(client_socket,client_address, channel_code, id_user, lock, public_key):
     try:
         session_exist = is_session_in_database(supabase, channel_code)
         if session_exist :
@@ -104,6 +152,7 @@ def join_channel(client_socket,client_address, channel_code, id_user, lock):
         client_socket.close()
 
 def start_server():
+
     log_in_user(supabase, "nathan.simoes93@gmail.com","rootroot")
     print(get_current_connected_user_id(supabase))
     ip = get_private_ip()
@@ -125,6 +174,9 @@ def start_server():
             client_socket, client_address = server_socket.accept()
             print(f"Accepted a new connection from {client_address}")
 
+            
+            rsa_keys = generate_rsa_keys()
+
             # Receive the channel code from the client
             channel_code = client_socket.recv(1024).decode('utf-8')
             print("Received channel code:", channel_code)
@@ -142,6 +194,8 @@ def start_server():
         log_out_user(supabase)
         delete_server(supabase, ip)
         server_socket.close()
+# ------------------------------------------------------------------
+
 
 if __name__ == "__main__":
     start_server()
