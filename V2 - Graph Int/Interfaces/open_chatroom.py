@@ -40,6 +40,25 @@ def open_chatroom(previous_win, width_win, height_win, code):
         previous_win.state('normal')
         previous_win.attributes("-alpha", 1.0)
 
+    def display_message(chat_box, user, message):
+        current_time = datetime.datetime.now()
+        current_time_string = current_time.strftime("%H:%M")
+
+        if user == username:
+            bg_color = "#222222"
+            text_color = "#FFFFFF"
+        else:
+            bg_color = "#333333"
+            text_color = "#FFFFFF"
+
+        chat_box.configure(state=tk.NORMAL)
+        chat_box.tag_config("time", foreground="#888888")
+        chat_box.tag_config("user", background=bg_color, foreground=text_color)
+        chat_box.insert(tk.END, f"({current_time_string}) ", "time")
+        chat_box.insert(tk.END, f"{user}: {message}\n", "user")
+        chat_box.configure(state=tk.DISABLED)
+        chat_box.see(tk.END)
+
     previous_win.withdraw()
 
     root = ctk.CTk()
@@ -96,6 +115,8 @@ def open_chatroom(previous_win, width_win, height_win, code):
 
         aes_key = rsa_decrypt(encrypted_aes_key, private_key)
 
+        display_message(chat_box, "ChatRoom", f"Welcome to the chat room! Share this code to invite others: {code}")
+
     except Exception as e:
         messagebox.showerror("Erreur", f"Impossible de se connecter au serveur : {e}")
         on_close()
@@ -116,25 +137,6 @@ def open_chatroom(previous_win, width_win, height_win, code):
                 messagebox.showerror("Erreur", f"Impossible d'envoyer le message : {e}")
         else:
             messagebox.showwarning("Attention", "Veuillez saisir un message.")
-
-    def display_message(chat_box, user, message):
-        current_time = datetime.datetime.now()
-        current_time_string = current_time.strftime("%H:%M")
-
-        if user == username:
-            bg_color = "#222222"
-            text_color = "#FFFFFF"
-        else:
-            bg_color = "#333333"
-            text_color = "#FFFFFF"
-
-        chat_box.configure(state=tk.NORMAL)
-        chat_box.tag_config("time", foreground="#888888")
-        chat_box.tag_config("user", background=bg_color, foreground=text_color)
-        chat_box.insert(tk.END, f"({current_time_string}) ", "time")
-        chat_box.insert(tk.END, f"{user}: {message}\n", "user")
-        chat_box.configure(state=tk.DISABLED)
-        chat_box.see(tk.END)
 
     def receive_messages(aes_key):
         while True:
