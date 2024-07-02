@@ -36,7 +36,12 @@ def find_free_port():
 
 # -------------------------------------------- File ----------------------------------------------
 def broadcast_file(file_name, file_size, file_data, id_user, channel_code):
+    user_id_sender = get_id_by_ip(supabase,id_user[0])
+    print("user_id_sender:",user_id_sender)
     users = get_session_users(supabase, channel_code)
+    # Delete the current user of the list
+    users = [user for user in users if user != user_id_sender]
+    print("users :",users)
     for receiver_id in users:
         if receiver_id != id_user:
             receiver_info = get_connection_all(supabase, receiver_id)

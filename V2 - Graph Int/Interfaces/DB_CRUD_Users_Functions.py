@@ -31,6 +31,13 @@ def get_id(client, mail):
     data = client.table("profile").select("id").eq("mail", mail).execute()
     return data.data[0]["id"]
 
+# Fonction afin de récupérer l'id user à partir de l'ip
+def get_id_by_ip(client,ip):
+    data = client.table("connections").select("user_id").eq("ip",ip).execute()
+    print("data_function:",data.data[0]["user_id"])
+    return data.data[0]["user_id"]
+
+
 #############################
 # UPDATE FUNCTIONS
 #############################
