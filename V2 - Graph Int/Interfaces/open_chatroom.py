@@ -9,6 +9,8 @@ import os
 from DB_main import supabase
 from DB_CRUD_Functions import *
 from Auth import *
+from rsa import *
+from crypto_utils import *
 
 client_socket = None
 
@@ -50,28 +52,46 @@ def open_chatroom(previous_win, width_win, height_win, code, username):
     input_frame.pack(padx=10, pady=5, fill=tk.X)
     message_entry = ctk.CTkEntry(input_frame, placeholder_text="Écrire un message...")
     message_entry.pack(side=tk.LEFT, padx=10, pady=5, fill=tk.X, expand=True)
-    message_entry.bind("<Return>", lambda event: send_message(chat_box, message_entry, client_socket))
+
+    message_entry.bind("<Return>", lambda event: send_message(chat_box, message_entry, client_socket, aes_key))
+
 
     try:
         ip, port = get_last_server(supabase)
         user_id = get_current_connected_user_id(supabase)
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        private_key, public_key = generate_rsa_keys()
         client_socket.connect((ip, port))
         client_socket.send(code.encode('utf-8'))
         response = client_socket.recv(1024).decode('utf-8')
+        print(response)
+
+        client_socket.send(public_key)
+        response = client_socket.recv(1024).decode('utf-8')
+        print(response)
+
         user_id_str = str(user_id)
         client_socket.send(user_id_str.encode('utf-8'))
         response = client_socket.recv(1024).decode('utf-8')
+        print(response)
+
+        client_socket.send(b"OK")
+        encrypted_aes_key = client_socket.recv(1024)
+
+        aes_key = rsa_decrypt(encrypted_aes_key, private_key)
+        
     except Exception as e:
         messagebox.showerror("Erreur", f"Impossible de se connecter au serveur : {e}")
         on_close()
         return
 
-    def send_message(chat_box, message_entry, client):
+
+    def send_message(chat_box, message_entry, client, aes_key):
         message = message_entry.get()
         if message:
             try:
-                client.send(message.encode('utf-8'))
+                encrypted_message = aes_encrypt(message, aes_key)
+                client.send(encrypted_message.encode('utf-8'))
                 display_message(chat_box, "Moi", message)
                 message_entry.delete(0, tk.END)
             except Exception as e:
@@ -96,7 +116,7 @@ def open_chatroom(previous_win, width_win, height_win, code, username):
         chat_box.configure(state=tk.DISABLED)
         chat_box.see(tk.END)
 
-    def receive_messages():
+    def receive_messages(aes_key):
         while True:
             try:
                 message_type = client_socket.recv(4)
@@ -128,14 +148,17 @@ def open_chatroom(previous_win, width_win, height_win, code, username):
 
 
                 else:
-                    message = message_type + client_socket.recv(1020)
-                    display_message(chat_box, "Other", message.decode('utf-8'))
+                    message = message_type + client_socket.recv(1020).decode('utf-8')
+                    decrypted_message = aes_decrypt(message, aes_key)
+                    if message and message != "Channel joined successfully.":
+                        display_message(chat_box, "Autre", decrypted_message)
+
             except Exception as e:
                 print("Error receiving messages:", e)
                 break
 
 
-    receive_thread = threading.Thread(target=receive_messages)
+    receive_thread = threading.Thread(target=receive_messages, args=(aes_key,))
     receive_thread.daemon = True
     receive_thread.start()
 
