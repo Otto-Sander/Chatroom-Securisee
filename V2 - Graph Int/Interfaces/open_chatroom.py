@@ -11,6 +11,8 @@ from DB_CRUD_Functions import *
 from Auth import *
 from rsa import *
 from crypto_utils import *
+from rsa import generate_rsa_keys
+from rsa import rsa_decrypt
 
 client_socket = None
 
