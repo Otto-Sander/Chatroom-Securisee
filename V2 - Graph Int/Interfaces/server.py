@@ -1,7 +1,5 @@
 import socket
 import threading
-import os
-import uuid
 from DB_CRUD_Functions import *
 from DB_Additional_Functions import *
 from DB_CRUD_Users_Functions import *
@@ -9,17 +7,13 @@ from DB_main import supabase
 from Auth import *
 import uuid
 from rsa import *
-from Crypto.Cipher import AES
-from Crypto.Random import get_random_bytes
-import base64
 from crypto_utils import *
+import os
 from rsa import rsa_encrypt
-from rsa import generate_rsa_keys
 
 server_socket = None
 stop_event = threading.Event()
 clients = {}
-session_aes = {}
 
 def get_private_ip():
     try:
@@ -40,24 +34,29 @@ def find_free_port():
     s.close()
     return port
 
-def broadcast_file(file_name, file_size, file_data, source):
-    for addr, conn in list(clients.items()):
-        if addr != source:
-            try:
-                # Send "FILE" indicator
-                conn.sendall(b"FILE")
-                # Send file metadata
-                conn.sendall(f"{file_name:<100}".encode('utf-8'))
-                conn.sendall(f"{file_size:<100}".encode('utf-8'))
-                # Send file data
-                conn.sendall(file_data)
-                print(f"File {file_name} sent to {addr}")
-            except Exception as e:
-                print(f"Send file error to {addr}: {e}")
-                clients.pop(addr)  # Remove invalid socket
+# -------------------------------------------- File ----------------------------------------------
+def broadcast_file(file_name, file_size, file_data, id_user, channel_code):
+    users = get_session_users(supabase, channel_code)
+    for receiver_id in users:
+        if receiver_id != id_user:
+            receiver_info = get_connection_all(supabase, receiver_id)
+            print(receiver_info)
+            for connection_info in receiver_info:
+                receiver_address = (connection_info['ip'], connection_info['port'])
+                receiver_socket = clients.get(receiver_address)
+            if receiver_socket:
+                try:
+                    receiver_socket.send(b'FILE')
+                    receiver_socket.send(f"{file_name:<100}".encode('utf-8'))
+                    receiver_socket.send(f"{file_size:<100}".encode('utf-8'))
+                    receiver_socket.send(file_data)
+                except Exception as e:
+                    print(f"Error sending message to user {receiver_id}: {e}")
+            else:
+                print(f"User {receiver_id} socket not found.")
 
 
-def receive_file(client_socket, client_address):
+def receive_file(client_socket, client_address, channel_code):
     if not os.path.exists("temp"):
         os.makedirs("temp")
 
@@ -81,14 +80,14 @@ def receive_file(client_socket, client_address):
         print(f"File {file_name} transfer complete.")
 
         # Broadcast the received file to all clients except the source
-        broadcast_file(file_name, file_size, received_file_data, client_address)
+        broadcast_file(file_name, file_size, received_file_data, client_address, channel_code)
 
     except Exception as e:
         print(f"Error receiving file from {client_address}: {e}")
 
+# -------------------------------------------- File ----------------------------------------------
 
 def client_handler(id_user, client_socket, client_address, channel_code, lock, aes_key, public_key):
-
     id_user_uuid = uuid.UUID(id_user)
     clients[client_address] = client_socket
     try:
@@ -96,19 +95,17 @@ def client_handler(id_user, client_socket, client_address, channel_code, lock, a
         client_socket.recv(1024) # Wait for the client to be ready to receive the encrypted AES key
         client_socket.send(encrypted_aes_key)
         while not stop_event.is_set():
-            message = client_socket.recv(1024)
-            if message:
-                if message == b"DISCONNECT":
+            message_type = client_socket.recv(1024)
+            if message_type:
+                if message_type == b"DISCONNECT":
                     print(f"Client {client_address} in channel {channel_code} is disconnecting.")
                     break
-                if message == b"FILE":
-                    receive_file(client_socket, client_address)
-                else:
-                    print(f"Message from {client_address} in channel {channel_code}: {message.decode('utf-8')}")
-
+                elif message_type == b"FILE":
+                    receive_file(client_socket, client_address, channel_code)
+                elif message_type == b"TEXT":
+                    message = client_socket.recv(1024)
                     with lock:
                         users = get_session_users(supabase, channel_code)
-                        print(users)
                         for receiver_id in users:
                             if receiver_id != id_user:
                                 receiver_info = get_connection_all(supabase, receiver_id)
@@ -116,14 +113,15 @@ def client_handler(id_user, client_socket, client_address, channel_code, lock, a
                                 for connection_info in receiver_info:
                                     receiver_address = (connection_info['ip'], connection_info['port'])
                                     receiver_socket = clients.get(receiver_address)
-                                    if receiver_socket:
-                                        try:
-                                            receiver_socket.send(message)
-                                            print(f"Message sent to user {receiver_id}")
-                                        except Exception as e:
-                                            print(f"Error sending message to user {receiver_id}: {e}")
-                                    else:
-                                        print(f"User {receiver_id} socket not found.")
+                                if receiver_socket:
+                                    try:
+                                        receiver_socket.send(b'TEXT')
+                                        receiver_socket.send(message)
+                                        print(f"Message sent to user {receiver_id}")
+                                    except Exception as e:
+                                        print(f"Error sending message to user {receiver_id}: {e}")
+                                else:
+                                    print(f"User {receiver_id} socket not found.")
             else:
                 break
     except Exception as e:
@@ -138,19 +136,16 @@ def client_handler(id_user, client_socket, client_address, channel_code, lock, a
         client_socket.close()
 
 
-
 def join_channel(client_socket,client_address, channel_code, id_user, lock,aes_key, public_key):
-
     try:
         session_exist = is_session_in_database(supabase, channel_code)
-        if session_exist:
+        if session_exist :
             ip = client_address[0]
             port = client_address[1]
             create_new_connection(supabase, id_user, channel_code, ip, port)
             add_next_user_in_session(supabase, channel_code, id_user)
         else:
             print(f"Channel {channel_code} does not exist.")
-
 
         # Start client handler thread for this client and channel
         threading.Thread(target=client_handler,
@@ -161,7 +156,7 @@ def join_channel(client_socket,client_address, channel_code, id_user, lock,aes_k
         client_socket.close()
 
 def start_server():
-    log_in_user(supabase, "nathan.simoes93@gmail.com", "rootroot")
+    log_in_user(supabase, "nathan.simoes93@gmail.com","rootroot")
     print(get_current_connected_user_id(supabase))
     ip = get_private_ip()
     port = find_free_port()
@@ -183,8 +178,7 @@ def start_server():
             client_socket, client_address = server_socket.accept()
             print(f"Accepted a new connection from {client_address}")
 
-            rsa_keys = generate_rsa_keys()
-
+            # Receive the channel code from the client
             channel_code = client_socket.recv(1024).decode('utf-8')
             print("Received channel code:", channel_code)
             client_socket.send(b"Channel code received.")

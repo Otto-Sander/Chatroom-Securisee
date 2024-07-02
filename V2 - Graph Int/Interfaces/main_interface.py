@@ -66,6 +66,9 @@ class MainInterface:
 # -----------------------------------------------------------------------------------------
         self.attempt_counter = 0
 
+        self.mail = None
+        self.password = None
+
         self.width_win= master.winfo_screenwidth()
         self.height_win= master.winfo_screenheight()
 
@@ -114,7 +117,7 @@ class MainInterface:
 
     #Connection panel : LOGIN PANEL --------------------------------------------------------------------------------------
     def show_authentication(self):
-        
+
         # Détruit l'ancienne fenêtre
         self.frame.destroy()
 
@@ -585,24 +588,30 @@ class MainInterface:
             self.back_to_config()
 
     def authenticate(self):
-        mail = self.mail_auth_entry.get()
-        password = self.passwd_auth_entry.get()
-        
-        # Attempt to log in the user
-        if mail == "" or password == "":
-            tk.messagebox.showerror("Error", "Email or password cannot be empty.")
-        elif log_in_user(supabase, mail, password):
+        if self.mail and self.password != None:
+            log_in_user(supabase, self.mail, self.password)
             self.attempt_counter = 0  # Reset the counter on successful login
             self.frame.destroy()  # Close the old interface
             self.show_config()
-            # Actual User's Data
-            self.mail = mail
-            self.password = password
         else:
-            self.attempt_counter += 1  # Increment the counter on failure
-            delay = 2 ** self.attempt_counter  # Exponential backoff
-            tk.messagebox.showerror("Error", f"Incorrect username or password or confirm your mail. Please wait {delay} seconds before trying again.")
-            time.sleep(delay)  # Wait for the calculated delay before allowing another attempt
+            mail = self.mail_auth_entry.get()
+            password = self.passwd_auth_entry.get()
+            
+            # Attempt to log in the user
+            if mail == "" or password == "":
+                tk.messagebox.showerror("Error", "Email or password cannot be empty.")
+            elif log_in_user(supabase, mail, password):
+                self.attempt_counter = 0  # Reset the counter on successful login
+                self.frame.destroy()  # Close the old interface
+                self.show_config()
+                # Actual User's Data
+                self.mail = mail
+                self.password = password
+            else:
+                self.attempt_counter += 1  # Increment the counter on failure
+                delay = 2 ** self.attempt_counter  # Exponential backoff
+                tk.messagebox.showerror("Error", f"Incorrect username or password or confirm your mail. Please wait {delay} seconds before trying again.")
+                time.sleep(delay)  # Wait for the calculated delay before allowing another attempt
     
     def generate_code(self):
         # Générer un code aléatoire de 7 caractères
@@ -639,6 +648,7 @@ class MainInterface:
         code = self.code_entry.get()
         if code:
             try:
+                self.authenticate()
                 # Connecter à la chatroom en utilisant les informations récupérées
                 open_chatroom(self.master, self.width_win, self.height_win,code)
 
@@ -652,11 +662,11 @@ class MainInterface:
         code = self.code_label.cget("text")
         if code:
             try:
+                self.authenticate()
                 # Connecter à la chatroom en utilisant les informations récupérées
                 open_chatroom(self.master,self.width_win,self.height_win,self.code)
 
                 print( "Successfully connected to the chatroom.")
-
             except IndexError:
                 tk.messagebox.showerror("Error", "Invalid session code.")
         else:
