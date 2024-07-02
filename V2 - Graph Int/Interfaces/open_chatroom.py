@@ -13,10 +13,14 @@ import os
 from crypto_utils import aes_decrypt
 from rsa import generate_rsa_keys
 from rsa import rsa_decrypt
+from DB_CRUD_Users_Functions import *
 
 client_socket = None
 
 def open_chatroom(previous_win, width_win, height_win, code):
+
+    # Récupère le username actuel
+    username = get_username(supabase,get_current_connected_user_email(supabase))
 
     def on_close():
         try:
@@ -106,7 +110,7 @@ def open_chatroom(previous_win, width_win, height_win, code):
                 encrypted_message = aes_encrypt(message, aes_key)
                 client.send(encrypted_message.encode('utf-8'))
                 print(encrypted_message)
-                display_message(chat_box, "Moi", message)
+                display_message(chat_box, username, message)
                 message_entry.delete(0, tk.END)
             except Exception as e:
                 messagebox.showerror("Erreur", f"Impossible d'envoyer le message : {e}")
@@ -117,7 +121,7 @@ def open_chatroom(previous_win, width_win, height_win, code):
         current_time = datetime.datetime.now()
         current_time_string = current_time.strftime("%H:%M")
 
-        if user == "Moi":
+        if user == username:
             bg_color = "#222222"
             text_color = "#FFFFFF"
         else:

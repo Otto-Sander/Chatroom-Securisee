@@ -27,6 +27,11 @@ def get_current_connected_user_id(client):
     data = client.auth.get_user()
     return data.user.id
 
+# Fonction qui permet de retourner le username de l'utilisateur connecté
+def get_current_connected_username(client):
+    data = client.auth.get_user()
+    return data.user_metadata.get('username')
+
 # Fonction qui retourne le mail de l'utilisateur qui est connecté
 def get_current_connected_user_email(client):
     data = client.auth.get_user()
