@@ -27,6 +27,7 @@ def open_chatroom(previous_win, width_win, height_win, code):
             # Send a "disconnect" message to the server
             if client_socket:
                 client_socket.sendall(b"DISCONNECT")
+                client_socket.sendall(username.encode('utf-8'))
         except Exception as e:
             print(f"Error sending disconnect message: {e}")
 
@@ -125,7 +126,7 @@ def open_chatroom(previous_win, width_win, height_win, code):
 
     def send_message(chat_box, message_entry, client, aes_key):
         client.send(b"TEXT")
-        client.send(username)
+        client.send(username).encode('utf-8')
         message = message_entry.get()
         if message:
             try:
@@ -194,7 +195,7 @@ def open_chatroom(previous_win, width_win, height_win, code):
                 with open(file_path, "rb") as file:
                     file_data = file.read()
                     client_socket.sendall(b"FILE")
-                    client_socket.sendall(username)
+                    client_socket.send(str(username).encode('utf-8'))
                     client_socket.sendall(f"{os.path.basename(file_path):<100}".encode('utf-8'))
                     client_socket.sendall(f"{file_size:<100}".encode('utf-8'))
                     client_socket.sendall(file_data)

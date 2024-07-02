@@ -52,7 +52,7 @@ def broadcast_file(file_name, file_size, file_data, id_user, channel_code, user)
             if receiver_socket:
                 try:
                     receiver_socket.send(b'FILE')
-                    receiver_socket.send(user)
+                    receiver_socket.send(user).encode('utf-8')
                     receiver_socket.send(f"{file_name:<100}".encode('utf-8'))
                     receiver_socket.send(f"{file_size:<100}".encode('utf-8'))
                     receiver_socket.send(file_data)
@@ -102,7 +102,7 @@ def client_handler(id_user, client_socket, client_address, channel_code, lock, a
         client_socket.send(encrypted_aes_key)
         while not stop_event.is_set():
             message_type = client_socket.recv(1024)
-            user = client_socket.recv(1024)
+            user = client_socket.recv(1024).decode('utf-8')
             if message_type:
                 if message_type == b"DISCONNECT":
                     print(f"Client {client_address} in channel {channel_code} is disconnecting.")
@@ -123,7 +123,7 @@ def client_handler(id_user, client_socket, client_address, channel_code, lock, a
                                 if receiver_socket:
                                     try:
                                         receiver_socket.send(b'TEXT')
-                                        receiver_socket.send(user)
+                                        receiver_socket.send(user).encode('utf-8')
                                         receiver_socket.send(message)
                                         print(f"Message sent to user {receiver_id}")
                                     except Exception as e:
