@@ -35,7 +35,7 @@ def find_free_port():
     return port
 
 # -------------------------------------------- File ----------------------------------------------
-def broadcast_file(file_name, file_size, file_data, id_user, channel_code):
+def broadcast_file(file_name, file_size, file_data, id_user, channel_code, user):
     user_id_sender = get_id_by_ip(supabase,id_user[0])
     print("user_id_sender:",user_id_sender)
     users = get_session_users(supabase, channel_code)
@@ -52,6 +52,7 @@ def broadcast_file(file_name, file_size, file_data, id_user, channel_code):
             if receiver_socket:
                 try:
                     receiver_socket.send(b'FILE')
+                    receiver_socket.send(user)
                     receiver_socket.send(f"{file_name:<100}".encode('utf-8'))
                     receiver_socket.send(f"{file_size:<100}".encode('utf-8'))
                     receiver_socket.send(file_data)
@@ -61,7 +62,7 @@ def broadcast_file(file_name, file_size, file_data, id_user, channel_code):
                 print(f"User {receiver_id} socket not found.")
 
 
-def receive_file(client_socket, client_address, channel_code):
+def receive_file(client_socket, client_address, channel_code, user):
     if not os.path.exists("temp"):
         os.makedirs("temp")
 
@@ -85,7 +86,7 @@ def receive_file(client_socket, client_address, channel_code):
         print(f"File {file_name} transfer complete.")
 
         # Broadcast the received file to all clients except the source
-        broadcast_file(file_name, file_size, received_file_data, client_address, channel_code)
+        broadcast_file(file_name, file_size, received_file_data, client_address, channel_code, user)
 
     except Exception as e:
         print(f"Error receiving file from {client_address}: {e}")
@@ -101,12 +102,13 @@ def client_handler(id_user, client_socket, client_address, channel_code, lock, a
         client_socket.send(encrypted_aes_key)
         while not stop_event.is_set():
             message_type = client_socket.recv(1024)
+            user = client_socket.recv(1024)
             if message_type:
                 if message_type == b"DISCONNECT":
                     print(f"Client {client_address} in channel {channel_code} is disconnecting.")
                     break
                 elif message_type == b"FILE":
-                    receive_file(client_socket, client_address, channel_code)
+                    receive_file(client_socket, client_address, channel_code, user)
                 elif message_type == b"TEXT":
                     message = client_socket.recv(1024)
                     with lock:
@@ -121,6 +123,7 @@ def client_handler(id_user, client_socket, client_address, channel_code, lock, a
                                 if receiver_socket:
                                     try:
                                         receiver_socket.send(b'TEXT')
+                                        receiver_socket.send(user)
                                         receiver_socket.send(message)
                                         print(f"Message sent to user {receiver_id}")
                                     except Exception as e:

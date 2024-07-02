@@ -125,6 +125,7 @@ def open_chatroom(previous_win, width_win, height_win, code):
 
     def send_message(chat_box, message_entry, client, aes_key):
         client.send(b"TEXT")
+        client.send(username)
         message = message_entry.get()
         if message:
             try:
@@ -142,6 +143,7 @@ def open_chatroom(previous_win, width_win, height_win, code):
         while True:
             try:
                 message_type = client_socket.recv(4)
+                user = client_socket.recv(100).decode('utf-8')
                 if message_type == b"FILE":
                     file_name = client_socket.recv(100).decode('utf-8').strip()
                     file_size = int(client_socket.recv(100).decode('utf-8').strip())
@@ -154,7 +156,7 @@ def open_chatroom(previous_win, width_win, height_win, code):
                         file_data += data
 
                     # Message box
-                    response = messagebox.askyesno("Received file !", f"Do you want to save '{file_name}'?")
+                    response = messagebox.askyesno("Received file !", f"Do you want to save '{file_name}' from {user} ?")
 
                     if response:
                         # Ask user to select save location
@@ -174,7 +176,7 @@ def open_chatroom(previous_win, width_win, height_win, code):
                     decrypted_message = aes_decrypt(message, aes_key)
 
                     if message and message != "Channel joined successfully.":
-                        display_message(chat_box, "Autre", decrypted_message)
+                        display_message(chat_box, user, decrypted_message)
             except Exception as e:
                 print("Erreur de réception des messages:", e)
                 break
@@ -192,6 +194,7 @@ def open_chatroom(previous_win, width_win, height_win, code):
                 with open(file_path, "rb") as file:
                     file_data = file.read()
                     client_socket.sendall(b"FILE")
+                    client_socket.sendall(username)
                     client_socket.sendall(f"{os.path.basename(file_path):<100}".encode('utf-8'))
                     client_socket.sendall(f"{file_size:<100}".encode('utf-8'))
                     client_socket.sendall(file_data)
