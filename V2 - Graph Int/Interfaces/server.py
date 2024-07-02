@@ -37,7 +37,8 @@ def client_handler(id_user, client_socket, client_address, channel_code, lock, a
     clients[client_address] = client_socket
     try:
         encrypted_aes_key = rsa_encrypt(aes_key, public_key)
-        client_socket.send(base64.b64encode(encrypted_aes_key))
+        client_socket.recv(1024) # Wait for the client to be ready to receive the encrypted AES key
+        client_socket.send(encrypted_aes_key)
         while not stop_event.is_set():
             message = client_socket.recv(1024)
             if message:
@@ -88,8 +89,6 @@ def join_channel(client_socket,client_address, channel_code, id_user, lock,aes_k
         else:
             print(f"Channel {channel_code} does not exist.")
 
-        client_socket.send(b"Channel joined successfully.")
-
         # Start client handler thread for this client and channel
         threading.Thread(target=client_handler,
                          args=(
@@ -126,7 +125,7 @@ def start_server():
             print("Received channel code:", channel_code)
             client_socket.send(b"Channel code received.")
 
-            public_key = client_socket.recv(1024).decode('utf-8')
+            public_key = client_socket.recv(1024)
             client_socket.send(b"Public key received.")
 
             id_user = client_socket.recv(1024).decode('utf-8')

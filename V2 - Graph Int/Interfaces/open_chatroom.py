@@ -62,7 +62,7 @@ def open_chatroom(previous_win, width_win, height_win, code):
     message_entry = ctk.CTkEntry(input_frame, placeholder_text="Écrire un message...")
     message_entry.pack(side=tk.LEFT, padx=10, pady=5, fill=tk.X, expand=True)
 
-    message_entry.bind("<Return>", lambda event: send_message(chat_box, message_entry, client_socket))
+    message_entry.bind("<Return>", lambda event: send_message(chat_box, message_entry, client_socket, aes_key))
 
     try:
         ip, port = get_last_server(supabase)
@@ -83,7 +83,9 @@ def open_chatroom(previous_win, width_win, height_win, code):
         response = client_socket.recv(1024).decode('utf-8')
         print(response)
 
+        client_socket.send(b"OK")
         encrypted_aes_key = client_socket.recv(1024)
+
         aes_key = rsa_decrypt(encrypted_aes_key, private_key)
 
     except Exception as e:
@@ -91,7 +93,8 @@ def open_chatroom(previous_win, width_win, height_win, code):
         on_close()
         return
 
-    def send_message(chat_box, message_entry, client):
+
+    def send_message(chat_box, message_entry, client, aes_key):
         message = message_entry.get()
         if message:
             try:
@@ -123,7 +126,7 @@ def open_chatroom(previous_win, width_win, height_win, code):
         chat_box.configure(state=tk.DISABLED)
         chat_box.see(tk.END)
 
-    def receive_messages():
+    def receive_messages(aes_key):
         while True:
             try:
                 message = client_socket.recv(1024).decode('utf-8')
@@ -134,7 +137,7 @@ def open_chatroom(previous_win, width_win, height_win, code):
                 print("Erreur de réception des messages:", e)
                 break
 
-    receive_thread = threading.Thread(target=receive_messages)
+    receive_thread = threading.Thread(target=receive_messages, args=(aes_key,))
     receive_thread.daemon = True
     receive_thread.start()
 
