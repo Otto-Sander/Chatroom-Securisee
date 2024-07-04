@@ -20,7 +20,7 @@ client_socket = None
 def open_chatroom(previous_win, width_win, height_win, code):
 
     # Récupère le username actuel
-    username = get_username(supabase,get_current_connected_user_email(supabase))
+    username = str(get_username(supabase,get_current_connected_user_email(supabase)))
 
     def on_close():
         try:
@@ -126,14 +126,13 @@ def open_chatroom(previous_win, width_win, height_win, code):
 
     def send_message(chat_box, message_entry, client, aes_key):
         client.send(b"TEXT")
-        client.send(username).encode('utf-8')
         message = message_entry.get()
         if message:
             try:
                 encrypted_message = aes_encrypt(message, aes_key)
-                client.send(encrypted_message.encode('utf-8'))
-                print(encrypted_message)
-                display_message(chat_box, username, message)
+                data = f"{username}|{encrypted_message}"
+                client.send(data.encode('utf-8'))
+                display_message(chat_box, "Moi", message)
                 message_entry.delete(0, tk.END)
             except Exception as e:
                 messagebox.showerror("Erreur", f"Impossible d'envoyer le message : {e}")
@@ -144,8 +143,8 @@ def open_chatroom(previous_win, width_win, height_win, code):
         while True:
             try:
                 message_type = client_socket.recv(4)
-                user = client_socket.recv(100).decode('utf-8')
                 if message_type == b"FILE":
+                    user = client_socket.recv(100).decode('utf-8').strip()
                     file_name = client_socket.recv(100).decode('utf-8').strip()
                     file_size = int(client_socket.recv(100).decode('utf-8').strip())
                     file_data = b""
@@ -172,11 +171,11 @@ def open_chatroom(previous_win, width_win, height_win, code):
                     else:
                         display_message(chat_box, "Other", f"File reception canceled by user: {file_name}")
                 else:
-                    message = client_socket.recv(1024).decode('utf-8')
-
-                    decrypted_message = aes_decrypt(message, aes_key)
-
-                    if message and message != "Channel joined successfully.":
+                    received_data = client_socket.recv(1024).decode('utf-8')
+                    if received_data:
+                        # Séparation du nom d'utilisateur et du message
+                        user, message = received_data.split('|', 1)
+                        decrypted_message = aes_decrypt(message, aes_key)
                         display_message(chat_box, user, decrypted_message)
             except Exception as e:
                 print("Erreur de réception des messages:", e)
@@ -195,7 +194,7 @@ def open_chatroom(previous_win, width_win, height_win, code):
                 with open(file_path, "rb") as file:
                     file_data = file.read()
                     client_socket.sendall(b"FILE")
-                    client_socket.send(str(username).encode('utf-8'))
+                    client_socket.sendall(f"{username:<100}".encode('utf-8'))
                     client_socket.sendall(f"{os.path.basename(file_path):<100}".encode('utf-8'))
                     client_socket.sendall(f"{file_size:<100}".encode('utf-8'))
                     client_socket.sendall(file_data)
